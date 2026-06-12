@@ -113,19 +113,22 @@ describe('collectionsDataset', () => {
 })
 
 describe('searchHitsDataset', () => {
-  it('parses lowercase yes/no flags and positions', async () => {
+  it('parses positions and trusts num_* counters over the dead yes/no flags', async () => {
     const csv =
-      '﻿partition_date,keywords,ASIN,product_name,position,page,total_found,total_displayed,clicked,added,purchased,is_organic_result,is_sponsored_result,device_type,operating_system_name,search_type,search_date\n' +
-      '2025-07-26T00:00:00Z,brandon sanderson,B000SRCH01,Wind and Truth,1,1,318,50,yes,no,no,yes,no,iPhone,iOS,keyword_search,2025-07-26T12:54:15Z\n'
+      '﻿partition_date,keywords,ASIN,product_name,position,page,total_found,total_displayed,clicked,added,purchased,num_clicks,num_adds,num_purchases,is_organic_result,is_sponsored_result,device_type,operating_system_name,search_type,search_date\n' +
+      '2025-07-26T00:00:00Z,brandon sanderson,B000SRCH01,Wind and Truth,1,1,318,50,yes,no,no,0,0,0,yes,no,iPhone,iOS,keyword_search,2025-07-26T12:54:15Z\n' +
+      '2025-07-26T00:00:00Z,brandon sanderson,B000SRCH02,Oathbringer,4,1,318,50,no,no,0,1,0,1,yes,no,iPhone,iOS,keyword_search,2025-07-26T12:55:15Z\n'
     const result = await searchHitsDataset.parse([
       vf('Digital.Audible.SearchData_Tommy_ASIN/Digital.Audible.SearchData_Tommy_ASIN.csv', csv),
     ])
-    const hit = result.patch.searchHits![0]!
-    expect(hit.clicked).toBe(true)
-    expect(hit.purchased).toBe(false)
-    expect(hit.position).toBe(1)
-    expect(hit.isOrganic).toBe(true)
-    expect(hit.searchAt).toBe(Date.UTC(2025, 6, 26, 12, 54, 15))
+    const [flagged, counted] = result.patch.searchHits!
+    expect(flagged!.clicked).toBe(true)
+    expect(flagged!.purchased).toBe(false)
+    expect(flagged!.position).toBe(1)
+    expect(flagged!.isOrganic).toBe(true)
+    expect(flagged!.searchAt).toBe(Date.UTC(2025, 6, 26, 12, 54, 15))
+    expect(counted!.clicked).toBe(true)
+    expect(counted!.purchased).toBe(true)
   })
 })
 

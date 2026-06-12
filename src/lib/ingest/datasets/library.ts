@@ -6,16 +6,23 @@ import { epochMs, int, sentinel, splitList, yesNo } from '../normalize'
 
 import type { DatasetDescriptor } from './descriptor'
 
-const SERIES_RE = /asin:([^,]*),\s*title:(.*)$/
+const SERIES_RE = /^asin:([^,]*),\s*title:(.*)$/
 
-export function parseSeriesInfo(value: string | undefined): SeriesRef | null {
+/**
+ * 'asin:A,title:X,asin:B,title:Y' — a flat repeating list; one book can sit
+ * in several series at once (saga + universe). Titles may contain commas,
+ * so entries split on ',asin:' boundaries only.
+ */
+export function parseSeriesInfo(value: string | undefined): SeriesRef[] {
   const raw = sentinel(value)
-  if (raw === null) return null
-  const match = SERIES_RE.exec(raw)
-  if (!match) return null
-  const title = match[2]?.trim()
-  if (!title) return null
-  return { asin: sentinel(match[1]), title }
+  if (raw === null) return []
+  const refs: SeriesRef[] = []
+  for (const chunk of raw.split(/,(?=asin:)/)) {
+    const match = SERIES_RE.exec(chunk.trim())
+    const title = match?.[2]?.trim()
+    if (match && title) refs.push({ asin: sentinel(match[1]), title })
+  }
+  return refs
 }
 
 /**
@@ -66,7 +73,7 @@ export function mergeLibraryRows(rows: RawLibraryRow[]): {
       .filter((v): v is number => v !== null)
     const series = group
       .map((row) => parseSeriesInfo(row.book_series_info))
-      .find((ref) => ref !== null)
+      .find((refs) => refs.length > 0)
 
     items.push({
       asin,
@@ -82,7 +89,7 @@ export function mergeLibraryRows(rows: RawLibraryRow[]): {
       availableInLibrary: yesNo(pick('available_in_library')),
       language: pick('language'),
       publisher: pick('publisher'),
-      series: series ?? null,
+      series: series ?? [],
       contentDeliveryType: pick('content_delivery_type'),
       acquisitionMethod: pick('acquisition_method'),
       formatType: pick('format_type'),

@@ -162,6 +162,9 @@ export interface RawSearchHitRow {
   clicked?: string
   added?: string
   purchased?: string
+  num_clicks?: string
+  num_adds?: string
+  num_purchases?: string
   is_organic_result?: string
   is_sponsored_result?: string
   device_type?: string

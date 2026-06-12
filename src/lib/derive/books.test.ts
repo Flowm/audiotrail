@@ -41,7 +41,7 @@ function libraryItem(over: Partial<LibraryItem> & { asin: string; title: string 
     availableInLibrary: true,
     language: null,
     publisher: null,
-    series: null,
+    series: [],
     contentDeliveryType: null,
     acquisitionMethod: null,
     formatType: null,

@@ -34,7 +34,8 @@ function normalizeTitle(title: string): string {
   return title.toLowerCase().replace(/\s+/g, ' ').trim()
 }
 
-function keyOf(asin: string | null, productName: string): string {
+/** Stable book identity shared by every session-level aggregation. */
+export function bookKey(asin: string | null, productName: string): string {
   return asin ?? `name:${normalizeTitle(productName)}`
 }
 
@@ -74,7 +75,7 @@ export function buildBookStats(
   const usedLibraryAsins = new Set<string>()
 
   for (const session of sessions) {
-    const key = keyOf(session.asin, session.productName)
+    const key = bookKey(session.asin, session.productName)
     if (session.audioType !== 'FullTitle') {
       sampledKeys.add(key)
       continue

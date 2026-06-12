@@ -54,7 +54,8 @@ export interface LibraryItem {
   /** Lowercase ISO 639-1, e.g. 'en', 'de'. */
   language: string | null
   publisher: string | null
-  series: SeriesRef | null
+  /** A book can belong to several series (e.g. a saga and its universe). */
+  series: SeriesRef[]
   /** 'SinglePartBook' | 'MultiPartBook' */
   contentDeliveryType: string | null
   acquisitionMethod: string | null

@@ -67,6 +67,8 @@ export const searchHitsDataset: DatasetDescriptor = {
       warnings.push(...csvWarnings.map((warning) => `${file.path}: ${warning}`))
       for (const raw of rows) {
         const row = raw as RawSearchHitRow
+        // The yes/no flags are unreliable (all 'no' in real takeouts even for
+        // clicked results) — the num_* counters carry the actual signal.
         searchHits.push({
           searchAt: epochMs(row.search_date),
           keywords: sentinel(row.keywords),
@@ -76,9 +78,9 @@ export const searchHitsDataset: DatasetDescriptor = {
           page: int(row.page),
           totalFound: int(row.total_found),
           totalDisplayed: int(row.total_displayed),
-          clicked: yesNo(row.clicked) ?? false,
-          added: yesNo(row.added) ?? false,
-          purchased: yesNo(row.purchased) ?? false,
+          clicked: (yesNo(row.clicked) ?? false) || (int(row.num_clicks) ?? 0) > 0,
+          added: (yesNo(row.added) ?? false) || (int(row.num_adds) ?? 0) > 0,
+          purchased: (yesNo(row.purchased) ?? false) || (int(row.num_purchases) ?? 0) > 0,
           isOrganic: yesNo(row.is_organic_result),
           isSponsored: yesNo(row.is_sponsored_result),
           deviceType: sentinel(row.device_type),

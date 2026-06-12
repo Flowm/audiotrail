@@ -13,19 +13,27 @@ const vf = (path: string, content: string): VirtualFile => ({
 
 describe('parseSeriesInfo', () => {
   it('parses asin and title', () => {
-    expect(parseSeriesInfo('asin:B09GXD7NNN,title:The Ripple System')).toEqual({
-      asin: 'B09GXD7NNN',
-      title: 'The Ripple System',
-    })
+    expect(parseSeriesInfo('asin:B09GXD7NNN,title:The Ripple System')).toEqual([
+      { asin: 'B09GXD7NNN', title: 'The Ripple System' },
+    ])
+  })
+
+  it('parses multi-series memberships (saga + universe)', () => {
+    expect(
+      parseSeriesInfo('asin:B071HGJBN6,title:The Stormlight Archive,asin:B0DMXT9PD3,title:The Cosmere'),
+    ).toEqual([
+      { asin: 'B071HGJBN6', title: 'The Stormlight Archive' },
+      { asin: 'B0DMXT9PD3', title: 'The Cosmere' },
+    ])
   })
 
   it('keeps commas inside the title', () => {
-    expect(parseSeriesInfo('asin:B09X,title:Foo, Bar')?.title).toBe('Foo, Bar')
+    expect(parseSeriesInfo('asin:B09X,title:Foo, Bar')[0]?.title).toBe('Foo, Bar')
   })
 
-  it('returns null for sentinels and malformed values', () => {
-    expect(parseSeriesInfo('Not Available')).toBeNull()
-    expect(parseSeriesInfo('just a string')).toBeNull()
+  it('returns empty for sentinels and malformed values', () => {
+    expect(parseSeriesInfo('Not Available')).toEqual([])
+    expect(parseSeriesInfo('just a string')).toEqual([])
   })
 })
 
@@ -66,7 +74,7 @@ describe('mergeLibraryRows', () => {
     expect(alpha.lengthMinutes).toBe(988)
     expect(alpha.language).toBe('en')
     expect(alpha.authors).toEqual(['A One', 'A Two'])
-    expect(alpha.series).toEqual({ asin: 'B09SER', title: 'The Series' })
+    expect(alpha.series).toEqual([{ asin: 'B09SER', title: 'The Series' }])
   })
 
   it('unions marketplaces, takes earliest purchase date and yes-wins finished', () => {
@@ -84,7 +92,7 @@ describe('mergeLibraryRows', () => {
     expect(beta.narrators).toEqual(['Travis Baldree'])
     expect(beta.isFinished).toBeNull()
     expect(beta.purchaseDate).toBeNull()
-    expect(beta.series).toBeNull()
+    expect(beta.series).toEqual([])
   })
 })
 
