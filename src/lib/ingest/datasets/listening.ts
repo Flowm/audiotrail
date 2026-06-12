@@ -8,6 +8,31 @@ import type { DatasetDescriptor } from './descriptor'
 
 const PROFILE_RE = /Audible\.Listening\/([^/]+)\/[^/]*\.csv$/i
 
+/**
+ * Multipart books replicate every session once per part: same ASIN, dates,
+ * positions and duration — only the product name differs by a ' Part N'
+ * suffix. Sessions sharing this identity are one real listening event.
+ */
+const PART_SUFFIX_RE = /\s+Part \d+$/i
+
+function identityKey(profile: string, session: Omit<ListeningSession, 'profile'>): string {
+  const subject =
+    session.asin ?? `n:${session.productName.replace(PART_SUFFIX_RE, '').toLowerCase()}`
+  return [
+    profile,
+    subject,
+    session.startDate,
+    session.endDate,
+    session.startPositionMs,
+    session.endPositionMs,
+    session.durationMs,
+    session.bookLengthMs,
+    session.deliveryType,
+    session.audioType,
+    session.listeningMode,
+  ].join('|')
+}
+
 export const listeningDataset: DatasetDescriptor = {
   key: 'listening',
   label: 'Listening history',
@@ -17,6 +42,8 @@ export const listeningDataset: DatasetDescriptor = {
     const sessions: ListeningSession[] = []
     const warnings: string[] = []
     const rowsPerProfile = new Map<string, number>()
+    const seen = new Map<string, ListeningSession>()
+    let duplicates = 0
 
     for (const file of files) {
       const profile = PROFILE_RE.exec(file.path)?.[1] ?? 'Unknown profile'
@@ -35,7 +62,7 @@ export const listeningDataset: DatasetDescriptor = {
         }
 
         const speed = num(row['Narration Speed'])
-        sessions.push({
+        const session: ListeningSession = {
           profile,
           startDate,
           endDate: isoDate(row['End Date']),
@@ -51,7 +78,20 @@ export const listeningDataset: DatasetDescriptor = {
           listeningMode: sentinel(row['Listening Mode']),
           appVersion: sentinel(row['App Version']),
           timezone: sentinel(row['Local Timezone']),
-        })
+        }
+
+        const key = identityKey(profile, session)
+        const existing = seen.get(key)
+        if (existing) {
+          duplicates += 1
+          // Keep the shortest name — the base title without the part suffix.
+          if (session.productName.length < existing.productName.length) {
+            existing.productName = session.productName
+          }
+          continue
+        }
+        seen.set(key, session)
+        sessions.push(session)
         rowsPerProfile.set(profile, (rowsPerProfile.get(profile) ?? 0) + 1)
       }
       if (skipped > 0) {
@@ -64,10 +104,13 @@ export const listeningDataset: DatasetDescriptor = {
       .sort((a, b) => b[1] - a[1])
       .map(([profile]) => profile)
 
+    const detailParts = [`${profiles.length} profile${profiles.length === 1 ? '' : 's'}`]
+    if (duplicates > 0) detailParts.push(`${duplicates} multipart echo rows dropped`)
+
     return {
       patch: { listening: sessions, profiles },
       rows: sessions.length,
-      detail: `${profiles.length} profile${profiles.length === 1 ? '' : 's'}`,
+      detail: detailParts.join(' · '),
       warnings,
     }
   },

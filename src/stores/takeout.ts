@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef } from 'vue'
 
+import { buildBookStats } from '@/lib/derive/books'
+import { dailyTotals } from '@/lib/derive/time'
 import { ingestTakeout } from '@/lib/ingest'
 import { zipProvider } from '@/lib/ingest/zip'
 import { useSettingsStore } from '@/stores/settings'
@@ -20,6 +22,17 @@ export const useTakeoutStore = defineStore('takeout', () => {
 
   const hasData = computed(() => bundle.value !== null)
   const profiles = computed(() => bundle.value?.profiles ?? [])
+
+  // Derived, profile-filtered views. Cached computeds — they only re-run
+  // when a new bundle is loaded or the selected profile changes.
+  const sessions = computed(() => {
+    const all = bundle.value?.listening ?? []
+    const profile = useSettingsStore().selectedProfile
+    return profile === 'all' ? all : all.filter((session) => session.profile === profile)
+  })
+  const days = computed(() => dailyTotals(sessions.value))
+  const bookStats = computed(() => buildBookStats(sessions.value, bundle.value?.library ?? []))
+  const accountInfo = computed(() => bundle.value?.account[0] ?? null)
 
   async function loadFromData(data: ArrayBuffer | Blob, name: string): Promise<void> {
     phase.value = 'parsing'
@@ -89,6 +102,10 @@ export const useTakeoutStore = defineStore('takeout', () => {
     sourceName,
     hasData,
     profiles,
+    sessions,
+    days,
+    bookStats,
+    accountInfo,
     loadFromFile,
     loadFromUrl,
     clear,

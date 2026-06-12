@@ -54,4 +54,29 @@ describe('listeningDataset', () => {
     expect(sample!.narrationSpeed).toBeNull()
     expect(sample!.startPositionMs).toBe(9019256)
   })
+
+  it('collapses multipart echo rows into one session with the base title', async () => {
+    const echoRow = (name: string): string =>
+      `"2024-03-01","2024-03-01","900000","1000","901000","${name}","B0MULTIPART","7200000","Download","1.00","0","FullTitle","No","Offline","Audible","4.0","Europe/Berlin"`
+    const csv =
+      '﻿' +
+      [
+        HEADER,
+        echoRow('Epic Saga (Unabridged) Part 1'),
+        echoRow('Epic Saga (Unabridged)'),
+        echoRow('Epic Saga (Unabridged) Part 2'),
+        // different position → a real second session, not an echo
+        `"2024-03-01","2024-03-01","900000","901000","1801000","Epic Saga (Unabridged)","B0MULTIPART","7200000","Download","1.00","0","FullTitle","No","Offline","Audible","4.0","Europe/Berlin"`,
+      ].join('\n')
+
+    const result = await listeningDataset.parse([
+      vf('Audible.Listening/Main/Listening.csv', csv),
+    ])
+
+    expect(result.rows).toBe(2)
+    expect(result.detail).toContain('2 multipart echo rows dropped')
+    expect(result.patch.listening!.every((s) => s.productName === 'Epic Saga (Unabridged)')).toBe(
+      true,
+    )
+  })
 })

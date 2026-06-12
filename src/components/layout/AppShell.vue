@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 
 import DarkToggle from '@/components/ui/DarkToggle.vue'
 import LogoMark from '@/components/ui/LogoMark.vue'
+import ProfileSwitcher from '@/components/ui/ProfileSwitcher.vue'
 import { useTakeoutStore } from '@/stores/takeout'
 
 interface NavItem {
@@ -197,6 +198,10 @@ function clearData(): void {
       </nav>
 
       <div class="space-y-3 border-t border-paper-200 px-5 py-4 dark:border-ink-800">
+        <div v-if="takeout.profiles.length > 1">
+          <p class="overline pb-1.5">Profile</p>
+          <ProfileSwitcher />
+        </div>
         <div class="flex items-center justify-between">
           <DarkToggle />
           <button
@@ -256,6 +261,9 @@ function clearData(): void {
             </a>
           </RouterLink>
         </nav>
+        <div v-if="takeout.hasData && takeout.profiles.length > 1" class="px-3 pb-2">
+          <ProfileSwitcher />
+        </div>
       </header>
 
       <main>

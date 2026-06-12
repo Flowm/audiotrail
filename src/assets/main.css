@@ -63,6 +63,7 @@
   --chart-heat-3: #c96a15;
   --chart-heat-4: #7e3a0e;
   --chart-empty-cell: #efeae0;
+  --chart-cell-border: #fbfaf6;
 }
 
 .dark {
@@ -85,6 +86,7 @@
   --chart-heat-3: #c97a1d;
   --chart-heat-4: #f0b35a;
   --chart-empty-cell: #211f1b;
+  --chart-cell-border: #1b1916;
 }
 
 @layer base {
