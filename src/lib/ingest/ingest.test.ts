@@ -46,7 +46,11 @@ describe('ingestTakeout', () => {
     expect(bundle.account).toHaveLength(1)
     expect(report.recognizedFileCount).toBe(4)
     expect(report.ignoredPaths).toEqual(['README.txt'])
-    expect(report.datasets.every((d) => d.status === 'loaded')).toBe(true)
+    const byKey = new Map(report.datasets.map((d) => [d.key, d.status]))
+    expect(byKey.get('listening')).toBe('loaded')
+    expect(byKey.get('library')).toBe('loaded')
+    expect(byKey.get('account')).toBe('loaded')
+    expect(byKey.get('purchases')).toBe('missing')
   })
 
   it('tolerates a wrapper directory around the service folders', async () => {

@@ -10,9 +10,12 @@ import {
   fillDays,
   longestStreak,
   monthlyTotals,
+  monthSpan,
   rollingAverage,
+  sessionLengthHistogram,
   weekdayAverages,
   weekdayOf,
+  weeklyTotals,
   yearlyTotals,
   type DayTotal,
 } from './time'
@@ -140,6 +143,39 @@ describe('weekdayOf / weekdayAverages', () => {
     expect(stats[0]).toEqual({ weekday: 0, totalMs: 1200, avgMs: 600 })
     expect(stats[6]).toEqual({ weekday: 6, totalMs: 700, avgMs: 350 })
     expect(stats[2]!.totalMs).toBe(0)
+  })
+})
+
+describe('weeklyTotals', () => {
+  it('groups by ISO week (Monday key), across year boundaries', () => {
+    // 2023-12-31 was a Sunday (week of Mon 2023-12-25); 2024-01-01 a Monday
+    const weeks = weeklyTotals([day('2023-12-31', 10), day('2024-01-01', 20), day('2024-01-07', 30)])
+    expect(weeks).toEqual([
+      { weekStart: '2023-12-25', ms: 10 },
+      { weekStart: '2024-01-01', ms: 50 },
+    ])
+  })
+})
+
+describe('monthSpan', () => {
+  it('spans months inclusively across year boundaries', () => {
+    expect(monthSpan('2023-11', '2024-02')).toEqual(['2023-11', '2023-12', '2024-01', '2024-02'])
+    expect(monthSpan('2024-05', '2024-05')).toEqual(['2024-05'])
+  })
+})
+
+describe('sessionLengthHistogram', () => {
+  it('buckets session durations', () => {
+    const buckets = sessionLengthHistogram([
+      session('2024-01-01', 5),
+      session('2024-01-01', 3 * 60_000),
+      session('2024-01-01', 45 * 60_000),
+      session('2024-01-01', 3 * 3_600_000),
+    ])
+    expect(buckets.find((b) => b.label === '< 1 min')!.count).toBe(1)
+    expect(buckets.find((b) => b.label === '1–5 min')!.count).toBe(1)
+    expect(buckets.find((b) => b.label === '30–60 min')!.count).toBe(1)
+    expect(buckets.find((b) => b.label === '2 h +')!.count).toBe(1)
   })
 })
 

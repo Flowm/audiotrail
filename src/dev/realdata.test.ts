@@ -57,6 +57,31 @@ describe.skipIf(!existsSync(zipPath))('real takeout smoke (local sample only)', 
     expect(statusOf('library').status).toBe('loaded')
     expect(statusOf('account').status).toBe('loaded')
 
+    // 1:1 CSV datasets: bundle length must equal an independent raw row count
+    const countRows = async (pathRe: RegExp): Promise<number> => {
+      let count = 0
+      for (const path of Object.keys(zip.files).filter((p) => pathRe.test(p) && !zip.files[p]!.dir)) {
+        const text = (await zip.file(path)!.async('string')).replace(/^﻿/, '')
+        count += Papa.parse<string[]>(text, { skipEmptyLines: 'greedy' }).data.length - 1
+      }
+      return count
+    }
+
+    expect(bundle.purchases).toHaveLength(await countRows(/Audible\.PurchaseHistory\/.*\.csv$/))
+    expect(bundle.credits).toHaveLength(await countRows(/Audible\.Credits\/.*\.csv$/))
+    expect(bundle.billings).toHaveLength(await countRows(/Audible\.MembershipBillings\/.*\.csv$/))
+    expect(bundle.wishlist).toHaveLength(await countRows(/Audible\.Wishlist\/.*\.csv$/))
+    expect(bundle.cart).toHaveLength(await countRows(/Audible\.CartHistory\/.*\.csv$/))
+    expect(bundle.returns).toHaveLength(await countRows(/Audible\.ContentReturn\/.*\.csv$/))
+    expect(bundle.devices).toHaveLength(await countRows(/Audible\.DeviceActivation\/.*\.csv$/))
+    expect(bundle.searchSessions).toHaveLength(await countRows(/SearchData_Tommy_Group\/.*\.csv$/))
+    expect(bundle.searchHits).toHaveLength(await countRows(/SearchData_Tommy_ASIN\/.*\.csv$/))
+    expect(bundle.playback).toHaveLength(await countRows(/Audible\.PlaybackMetrics\/.*\.csv$/))
+
+    // two byte-identical collections files → exactly half the raw rows survive
+    const collectionsRaw = await countRows(/Collections[^/]*\/.*\.csv$/)
+    expect(bundle.collections.length + bundle.collectionItems.length).toBe(collectionsRaw / 2)
+
     // merged library has unique ASINs
     expect(new Set(bundle.library.map((item) => item.asin)).size).toBe(bundle.library.length)
     expect(bundle.library.length).toBeGreaterThan(0)
@@ -72,6 +97,20 @@ describe.skipIf(!existsSync(zipPath))('real takeout smoke (local sample only)', 
         totalListeningHours:
           Math.round((bundle.listening.reduce((sum, s) => sum + s.durationMs, 0) / 3.6e6) * 10) /
           10,
+        purchases: bundle.purchases.length,
+        credits: bundle.credits.length,
+        billings: bundle.billings.length,
+        wishlist: bundle.wishlist.length,
+        collections: bundle.collections.length,
+        collectionItems: bundle.collectionItems.length,
+        searchSessions: bundle.searchSessions.length,
+        searchHits: bundle.searchHits.length,
+        playback: bundle.playback.length,
+        cart: bundle.cart.length,
+        returns: bundle.returns.length,
+        devices: bundle.devices.length,
+        impressions: bundle.impressions.length,
+        membershipEvents: bundle.membershipEvents.length,
         parseMs: report.durationMs,
       }),
     )

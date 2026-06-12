@@ -51,6 +51,35 @@ export function fillDays(days: DayTotal[]): DayTotal[] {
   return filled
 }
 
+/** ISO-week totals keyed by the Monday of each week. */
+export function weeklyTotals(days: DayTotal[]): { weekStart: IsoDate; ms: number }[] {
+  const byWeek = new Map<IsoDate, number>()
+  for (const day of days) {
+    const epoch = epochDay(day.date)
+    const monday = dayToIso(epoch - ((epoch + 3) % 7))
+    byWeek.set(monday, (byWeek.get(monday) ?? 0) + day.ms)
+  }
+  return [...byWeek.entries()]
+    .map(([weekStart, ms]) => ({ weekStart, ms }))
+    .sort((a, b) => (a.weekStart < b.weekStart ? -1 : 1))
+}
+
+/** Every 'YYYY-MM' from first to last, inclusive — for gapless month axes. */
+export function monthSpan(first: string, last: string): string[] {
+  const months: string[] = []
+  let [year, month] = first.split('-').map(Number) as [number, number]
+  const [lastYear, lastMonth] = last.split('-').map(Number) as [number, number]
+  while (year < lastYear || (year === lastYear && month <= lastMonth)) {
+    months.push(`${year}-${String(month).padStart(2, '0')}`)
+    month += 1
+    if (month > 12) {
+      month = 1
+      year += 1
+    }
+  }
+  return months
+}
+
 export function monthlyTotals(days: DayTotal[]): { month: string; ms: number }[] {
   const byMonth = new Map<string, number>()
   for (const day of days) {
@@ -152,6 +181,30 @@ export function weekdayAverages(days: DayTotal[]): WeekdayStat[] {
     totalMs,
     avgMs: counts[weekday]! > 0 ? totalMs / counts[weekday]! : 0,
   }))
+}
+
+export interface HistogramBucket {
+  label: string
+  count: number
+}
+
+const SESSION_BUCKETS: { label: string; maxMs: number }[] = [
+  { label: '< 1 min', maxMs: 60_000 },
+  { label: '1–5 min', maxMs: 5 * 60_000 },
+  { label: '5–15 min', maxMs: 15 * 60_000 },
+  { label: '15–30 min', maxMs: 30 * 60_000 },
+  { label: '30–60 min', maxMs: 60 * 60_000 },
+  { label: '1–2 h', maxMs: 120 * 60_000 },
+  { label: '2 h +', maxMs: Number.POSITIVE_INFINITY },
+]
+
+export function sessionLengthHistogram(sessions: ListeningSession[]): HistogramBucket[] {
+  const counts = SESSION_BUCKETS.map((bucket) => ({ label: bucket.label, count: 0 }))
+  for (const session of sessions) {
+    const index = SESSION_BUCKETS.findIndex((bucket) => session.durationMs < bucket.maxMs)
+    counts[index === -1 ? counts.length - 1 : index]!.count += 1
+  }
+  return counts
 }
 
 export interface BigDay {
