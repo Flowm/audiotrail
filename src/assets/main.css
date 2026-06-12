@@ -1,0 +1,132 @@
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/schibsted-grotesk';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-paper-50: #faf8f4;
+  --color-paper-100: #f4f0e8;
+  --color-paper-200: #e9e2d4;
+  --color-paper-300: #d9cfba;
+
+  --color-ink-50: #f6f5f2;
+  --color-ink-100: #e8e6e1;
+  --color-ink-200: #d3d0c8;
+  --color-ink-300: #b5b1a6;
+  --color-ink-400: #97928a;
+  --color-ink-500: #79746b;
+  --color-ink-600: #5d5950;
+  --color-ink-700: #46423b;
+  --color-ink-800: #2e2b26;
+  --color-ink-900: #201e1a;
+  --color-ink-950: #161410;
+
+  --color-accent-50: #fdf6ec;
+  --color-accent-100: #faeacf;
+  --color-accent-200: #f5d49e;
+  --color-accent-300: #efb96a;
+  --color-accent-400: #e89c40;
+  --color-accent-500: #e1821f;
+  --color-accent-600: #c96a15;
+  --color-accent-700: #a75214;
+  --color-accent-800: #884317;
+  --color-accent-900: #703816;
+  --color-accent-950: #3f1d0a;
+}
+
+/* Chart colors live as plain CSS vars (not utilities) so ECharts can read
+   resolved values via getComputedStyle in both themes. */
+:root {
+  --chart-text: #79746b;
+  --chart-text-strong: #2e2b26;
+  --chart-axis: #d3d0c8;
+  --chart-split: #eae5da;
+  --chart-tooltip-bg: #201e1a;
+  --chart-tooltip-text: #f4f0e8;
+  --chart-c1: #c96a15;
+  --chart-c2: #4d7298;
+  --chart-c3: #74804a;
+  --chart-c4: #96565e;
+  --chart-c5: #3c8273;
+  --chart-c6: #80709f;
+  --chart-c7: #b08d2f;
+  --chart-c8: #6d6a64;
+  --chart-heat-1: #f3ddb0;
+  --chart-heat-2: #eaa953;
+  --chart-heat-3: #c96a15;
+  --chart-heat-4: #7e3a0e;
+  --chart-empty-cell: #efeae0;
+}
+
+.dark {
+  --chart-text: #97928a;
+  --chart-text-strong: #e8e6e1;
+  --chart-axis: #46423b;
+  --chart-split: #262420;
+  --chart-tooltip-bg: #f4f0e8;
+  --chart-tooltip-text: #201e1a;
+  --chart-c1: #e89c40;
+  --chart-c2: #7da7cd;
+  --chart-c3: #a3b376;
+  --chart-c4: #c98991;
+  --chart-c5: #6fb3a3;
+  --chart-c6: #a99ac7;
+  --chart-c7: #d4ad52;
+  --chart-c8: #8b8780;
+  --chart-heat-1: #4a3214;
+  --chart-heat-2: #8a5512;
+  --chart-heat-3: #c97a1d;
+  --chart-heat-4: #f0b35a;
+  --chart-empty-cell: #211f1b;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper-50 font-sans text-ink-800 antialiased dark:bg-ink-950 dark:text-ink-100;
+  }
+
+  /* Print-grain overlay: part of the "liner notes" look. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .dark body::after {
+    opacity: 0.06;
+  }
+
+  ::selection {
+    @apply bg-accent-200 text-ink-900;
+  }
+
+  .dark ::selection {
+    @apply bg-accent-800 text-paper-50;
+  }
+}
+
+@layer components {
+  /* Editorial micro-label above headings — part of the report identity. */
+  .overline {
+    @apply font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-ink-400 dark:text-ink-500;
+  }
+
+  .panel {
+    @apply rounded-2xl border border-paper-200 bg-white/70 dark:border-ink-800 dark:bg-ink-900/60;
+  }
+}
