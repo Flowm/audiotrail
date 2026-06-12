@@ -43,6 +43,18 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    // echarts is one deliberate lazy-loaded chunk shared by all chart views;
+    // it never blocks the upload page. ~245 kB gzip is its expected size.
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          echarts: ['echarts', 'vue-echarts'],
+        },
+      },
+    },
+  },
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
