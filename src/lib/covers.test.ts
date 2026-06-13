@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { coverHue, coverUrl, titleInitials } from './covers'
+import { audnexusRegion, coverHue, titleInitials } from './covers'
 
 describe('coverHue', () => {
   it('is deterministic and in range', () => {
@@ -14,9 +14,22 @@ describe('coverHue', () => {
   })
 })
 
-describe('coverUrl', () => {
-  it('builds the Amazon CDN url from the ASIN', () => {
-    expect(coverUrl('B0FZVDL7K2')).toBe('https://m.media-amazon.com/images/P/B0FZVDL7K2.jpg')
+describe('audnexusRegion', () => {
+  it('maps the country code first', () => {
+    expect(audnexusRegion('DE', 'www.audible.com')).toBe('de')
+    expect(audnexusRegion('us', null)).toBe('us')
+    expect(audnexusRegion('AT', null)).toBe('de')
+  })
+
+  it('falls back to the marketplace domain', () => {
+    expect(audnexusRegion(null, 'www.audible.de')).toBe('de')
+    expect(audnexusRegion(null, 'www.audible.co.uk')).toBe('uk')
+    expect(audnexusRegion(null, 'www.audible.com')).toBe('us')
+  })
+
+  it('defaults to us when nothing matches', () => {
+    expect(audnexusRegion(null, null)).toBe('us')
+    expect(audnexusRegion('ZZ', 'example.org')).toBe('us')
   })
 })
 

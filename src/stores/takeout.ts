@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef } from 'vue'
 
+import { audnexusRegion } from '@/lib/covers'
 import { buildBookStats } from '@/lib/derive/books'
 import { dailyTotals } from '@/lib/derive/time'
 import { ingestTakeout } from '@/lib/ingest'
@@ -33,6 +34,10 @@ export const useTakeoutStore = defineStore('takeout', () => {
   const days = computed(() => dailyTotals(sessions.value))
   const bookStats = computed(() => buildBookStats(sessions.value, bundle.value?.library ?? []))
   const accountInfo = computed(() => bundle.value?.account[0] ?? null)
+  // Audnexus marketplace for opt-in cover lookups, derived from the account.
+  const coverRegion = computed(() =>
+    audnexusRegion(accountInfo.value?.countryCode, accountInfo.value?.marketplace),
+  )
 
   async function loadFromData(data: ArrayBuffer | Blob, name: string): Promise<void> {
     phase.value = 'parsing'
@@ -106,6 +111,7 @@ export const useTakeoutStore = defineStore('takeout', () => {
     days,
     bookStats,
     accountInfo,
+    coverRegion,
     loadFromFile,
     loadFromUrl,
     clear,

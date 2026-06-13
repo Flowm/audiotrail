@@ -14,9 +14,11 @@ you, and a yearly *Wrapped* story to top it off.
 - **Nothing is stored.** Close the tab and the data is gone; drop the zip again next
   time. `localStorage` holds only display preferences (dark mode, the covers toggle).
 - **No third-party requests** — fonts are self-hosted, charts render locally. The one
-  deliberate exception is the **opt-in** cover-art toggle (off by default), which
-  fetches jacket images from Amazon's public image CDN by ASIN. Leave it off and you
-  get deterministic generated placeholder covers instead.
+  deliberate exception is the **opt-in** cover-art toggle (off by default). Audible
+  artwork can't be addressed by ASIN directly, so enabling it sends each book's ASIN to
+  the [Audnexus](https://audnex.us) API to resolve the cover, which then loads from
+  Amazon's image CDN. Leave it off and you get deterministic generated placeholder
+  covers instead.
 
 ## Get your takeout
 

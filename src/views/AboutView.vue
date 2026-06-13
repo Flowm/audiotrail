@@ -55,9 +55,12 @@ const datasets: Array<{ name: string; blurb: string }> = [
         </li>
         <li class="flex gap-3">
           <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-500" />
-          One deliberate exception: an opt-in toggle (off by default) can load real cover art
-          from Amazon's public image CDN. Enabling it reveals the book IDs (ASINs) of your
-          library to Amazon. Leave it off and you get generated placeholder covers instead.
+          One deliberate exception: an opt-in toggle (off by default) can load real cover art.
+          Because Audible artwork can't be addressed by ASIN directly, enabling it sends each
+          book's ASIN to <a href="https://audnex.us" target="_blank" rel="noopener" class="underline underline-offset-2">Audnexus</a>
+          (a community Audible-metadata API) to look up the cover, which then loads from Amazon's
+          image CDN — so both Audnexus and Amazon see your library's book IDs. Leave it off and
+          you get generated placeholder covers instead.
         </li>
       </ul>
     </section>
@@ -86,9 +89,9 @@ const datasets: Array<{ name: string; blurb: string }> = [
       <p class="mt-4 max-w-2xl text-sm leading-relaxed text-ink-600 dark:text-ink-300">
         Built with Vue 3, Vite, Tailwind CSS and Apache ECharts; zips are opened with JSZip and
         CSVs parsed with Papa Parse. Type is set in Fraunces, Schibsted Grotesk and IBM Plex Mono,
-        self-hosted so the app makes no font-CDN requests. Audiotrail is an independent project
-        and is not affiliated with, endorsed by, or connected to Audible or Amazon; all trademarks
-        belong to their owners.
+        self-hosted so the app makes no font-CDN requests. Opt-in cover art is resolved through
+        the Audnexus API. Audiotrail is an independent project and is not affiliated with, endorsed
+        by, or connected to Audible or Amazon; all trademarks belong to their owners.
       </p>
     </section>
   </div>

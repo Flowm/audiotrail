@@ -167,7 +167,7 @@ const totalLengthMs = computed(() =>
           </span>
         </label>
         <p class="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-400 dark:text-ink-500">
-          off = private placeholders · on = fetches covers from Amazon by ASIN
+          off = private placeholders · on = sends ASINs to Audnexus + Amazon
         </p>
       </section>
 
