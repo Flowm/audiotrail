@@ -15,6 +15,7 @@ import {
   weekdayOption,
   type RhythmGranularity,
 } from '@/lib/charts/listening'
+import { monthlySeriesHours } from '@/lib/derive/people'
 import {
   biggestDays,
   sessionLengthHistogram,
@@ -29,6 +30,7 @@ const listening = useDataset('listening')
 
 const sessions = computed(() => takeout.sessions)
 const days = computed(() => takeout.days)
+const books = computed(() => takeout.bookStats.books)
 
 const granularity = ref<RhythmGranularity>('day')
 const granularities: { key: RhythmGranularity; label: string }[] = [
@@ -41,7 +43,7 @@ const rhythm = computed(() =>
   days.value.length > 0 ? rhythmOption(granularity.value, days.value, palette.value) : null,
 )
 const eras = computed(() =>
-  sessions.value.length > 0 ? erasOption(sessions.value, palette.value) : null,
+  erasOption(monthlySeriesHours(sessions.value, books.value), palette.value),
 )
 const weekday = computed(() =>
   days.value.length > 0 ? weekdayOption(weekdayAverages(days.value), palette.value) : null,
@@ -165,7 +167,7 @@ const avgPerActiveDay = computed(() =>
       </section>
 
       <section class="space-y-3">
-        <SectionHeader title="Eras" hint="monthly hours by book" />
+        <SectionHeader title="Eras" hint="monthly hours by series" />
         <div class="panel p-3 sm:p-4">
           <BaseChart :option="eras" :height="340" />
         </div>

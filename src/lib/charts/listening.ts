@@ -3,16 +3,17 @@ import type { EChartsOption } from 'echarts'
 import { formatDuration, formatMonth } from '@/lib/format'
 
 import {
+  dayToIso,
+  epochDay,
   fillDays,
   monthlyTotals,
   monthSpan,
-  rollingAverage,
   weeklyTotals,
   type DayTotal,
   type HistogramBucket,
   type WeekdayStat,
 } from '@/lib/derive/time'
-import type { ListeningSession } from '@/types/models'
+import type { SeriesEras } from '@/lib/derive/people'
 
 import { baseTooltip, monoAxisLabel, truncate, withAlpha } from './common'
 
@@ -20,64 +21,104 @@ import type { ChartPalette } from './types'
 
 export type RhythmGranularity = 'day' | 'week' | 'month'
 
-const round1 = (value: number): number => Math.round(value * 10) / 10
+const HOUR_MS = 3_600_000
 
-/** Bars of listening time with dataZoom; daily granularity adds 7/30-day rolling averages. */
+/** Trailing moving average over a numeric series; the window is in points. */
+function trailingAverage(values: number[], window: number): number[] {
+  const out: number[] = []
+  let sum = 0
+  for (let i = 0; i < values.length; i += 1) {
+    sum += values[i]!
+    if (i >= window) sum -= values[i - window]!
+    out.push(sum / Math.min(i + 1, window))
+  }
+  return out
+}
+
+interface AvgLine {
+  window: number
+  label: string
+}
+
+// A short + long trailing-average pair scaled to each granularity.
+const AVG_LINES: Record<RhythmGranularity, [AvgLine, AvgLine]> = {
+  day: [
+    { window: 7, label: '7-day avg' },
+    { window: 30, label: '30-day avg' },
+  ],
+  week: [
+    { window: 4, label: '4-week avg' },
+    { window: 12, label: '12-week avg' },
+  ],
+  month: [
+    { window: 3, label: '3-month avg' },
+    { window: 12, label: '12-month avg' },
+  ],
+}
+
+/**
+ * Listening time per period, always in hours, with a dataZoom brush and two
+ * trailing-average lines. The bar series is in the legend too, so clicking it
+ * hides the bars and leaves just the average lines.
+ */
 export function rhythmOption(
   granularity: RhythmGranularity,
   days: DayTotal[],
   p: ChartPalette,
 ): EChartsOption {
-  let categories: string[]
-  let values: number[]
-  let unit: 'min' | 'h'
+  let categories: string[] = []
+  let values: number[] = []
 
   if (granularity === 'day') {
     const filled = fillDays(days)
     categories = filled.map((day) => day.date)
-    values = filled.map((day) => Math.round(day.ms / 60_000))
-    unit = 'min'
+    values = filled.map((day) => day.ms / HOUR_MS)
   } else if (granularity === 'week') {
+    // Gap-fill silent weeks so the trailing average counts them as zero.
     const weeks = weeklyTotals(days)
-    categories = weeks.map((week) => week.weekStart)
-    values = weeks.map((week) => round1(week.ms / 3_600_000))
-    unit = 'h'
+    if (weeks.length > 0) {
+      const byWeek = new Map(weeks.map((week) => [week.weekStart, week.ms]))
+      const last = epochDay(weeks[weeks.length - 1]!.weekStart)
+      for (let day = epochDay(weeks[0]!.weekStart); day <= last; day += 7) {
+        const weekStart = dayToIso(day)
+        categories.push(weekStart)
+        values.push((byWeek.get(weekStart) ?? 0) / HOUR_MS)
+      }
+    }
   } else {
     const monthly = monthlyTotals(days)
     const months =
       monthly.length > 0 ? monthSpan(monthly[0]!.month, monthly[monthly.length - 1]!.month) : []
     const byMonth = new Map(monthly.map((entry) => [entry.month, entry.ms]))
     categories = months
-    values = months.map((month) => round1((byMonth.get(month) ?? 0) / 3_600_000))
-    unit = 'h'
+    values = months.map((month) => (byMonth.get(month) ?? 0) / HOUR_MS)
   }
+
+  const barName =
+    granularity === 'day' ? 'per day' : granularity === 'week' ? 'per week' : 'per month'
+  const [shortAvg, longAvg] = AVG_LINES[granularity]
+  const avgColors = [p.series[1]!, p.series[4]!]
 
   const series: Record<string, unknown>[] = [
     {
-      name: granularity === 'day' ? 'minutes' : 'hours',
+      name: barName,
       type: 'bar',
       data: values,
       barCategoryGap: granularity === 'day' ? '0%' : '25%',
       itemStyle: { color: granularity === 'day' ? withAlpha(p.accent, 0.8) : p.accent },
+      z: 1,
     },
+    ...[shortAvg, longAvg].map((avg, index) => ({
+      name: avg.label,
+      type: 'line' as const,
+      data: trailingAverage(values, avg.window),
+      showSymbol: false,
+      smooth: 0.3,
+      lineStyle: { color: avgColors[index], width: 1.6 },
+      itemStyle: { color: avgColors[index] },
+      z: 3 - index,
+    })),
   ]
-
-  if (granularity === 'day') {
-    for (const [window, color] of [
-      [7, p.series[1]!],
-      [30, p.series[4]!],
-    ] as const) {
-      series.push({
-        name: `${window}-day avg`,
-        type: 'line',
-        data: rollingAverage(days, window).map((entry) => Math.round(entry.ms / 60_000)),
-        showSymbol: false,
-        smooth: 0.3,
-        lineStyle: { color, width: 1.6 },
-        itemStyle: { color },
-      })
-    }
-  }
 
   // default view: roughly the most recent year
   const startIndex =
@@ -88,26 +129,21 @@ export function rhythmOption(
         : 0
 
   return {
-    grid: { left: 46, right: 14, top: 30, bottom: 56 },
-    legend:
-      granularity === 'day'
-        ? {
-            top: 0,
-            right: 0,
-            icon: 'roundRect',
-            itemWidth: 10,
-            itemHeight: 3,
-            textStyle: { color: p.text, fontSize: 10 },
-            data: ['7-day avg', '30-day avg'],
-          }
-        : undefined,
+    grid: { left: 8, right: 14, top: 34, bottom: 56, containLabel: true },
+    legend: {
+      top: 2,
+      right: 0,
+      icon: 'roundRect',
+      itemWidth: 12,
+      itemHeight: 8,
+      textStyle: { color: p.text, fontSize: 10 },
+      data: [barName, shortAvg.label, longAvg.label],
+    },
     tooltip: {
       ...baseTooltip(p),
       trigger: 'axis',
       valueFormatter: (value) =>
-        unit === 'min'
-          ? formatDuration((Number(value) || 0) * 60_000)
-          : `${Number(value) || 0} h`,
+        value == null ? '—' : formatDuration((Number(value) || 0) * HOUR_MS),
     },
     xAxis: {
       type: 'category',
@@ -123,7 +159,7 @@ export function rhythmOption(
     },
     yAxis: {
       type: 'value',
-      axisLabel: { ...monoAxisLabel(p), formatter: `{value} ${unit}` },
+      axisLabel: { ...monoAxisLabel(p), formatter: '{value} h' },
       splitLine: { lineStyle: { color: p.split } },
     },
     dataZoom: [
@@ -143,58 +179,24 @@ export function rhythmOption(
   }
 }
 
-/** Monthly hours stacked by the top-N books — the "eras" chart. */
-export function erasOption(sessions: ListeningSession[], p: ChartPalette): EChartsOption | null {
-  const totals = new Map<string, number>()
-  const titles = new Map<string, string>()
-  const perMonth = new Map<string, Map<string, number>>()
+/** Monthly hours stacked by the top series — the "eras" chart. */
+export function erasOption(eras: SeriesEras, p: ChartPalette): EChartsOption | null {
+  if (eras.groups.length === 0 && eras.other.every((hours) => hours === 0)) return null
 
-  for (const session of sessions) {
-    if (session.audioType !== 'FullTitle') continue
-    const key = session.asin ?? `name:${session.productName.toLowerCase()}`
-    totals.set(key, (totals.get(key) ?? 0) + session.durationMs)
-    const existing = titles.get(key)
-    if (existing === undefined || session.productName.length < existing.length) {
-      titles.set(key, session.productName)
-    }
-    const month = session.startDate.slice(0, 7)
-    let bucket = perMonth.get(month)
-    if (!bucket) {
-      bucket = new Map()
-      perMonth.set(month, bucket)
-    }
-    bucket.set(key, (bucket.get(key) ?? 0) + session.durationMs)
-  }
-
-  if (perMonth.size === 0) return null
-  const monthKeys = [...perMonth.keys()].sort()
-  const months = monthSpan(monthKeys[0]!, monthKeys[monthKeys.length - 1]!)
-  const topKeys = [...totals.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([key]) => key)
-  const topSet = new Set(topKeys)
-
-  const series = topKeys.map((key, index) => ({
-    name: truncate(titles.get(key) ?? key, 26),
-    type: 'bar' as const,
-    stack: 'books',
+  const series: Record<string, unknown>[] = eras.groups.map((group, index) => ({
+    name: truncate(group.title, 26),
+    type: 'bar',
+    stack: 'series',
     itemStyle: { color: p.series[index % p.series.length] },
-    data: months.map((month) => round1((perMonth.get(month)?.get(key) ?? 0) / 3_600_000)),
+    data: group.data,
   }))
 
   series.push({
     name: 'everything else',
     type: 'bar',
-    stack: 'books',
+    stack: 'series',
     itemStyle: { color: withAlpha(p.text, 0.25) },
-    data: months.map((month) => {
-      let rest = 0
-      for (const [key, ms] of perMonth.get(month) ?? []) {
-        if (!topSet.has(key)) rest += ms
-      }
-      return round1(rest / 3_600_000)
-    }),
+    data: eras.other,
   })
 
   return {
@@ -217,7 +219,7 @@ export function erasOption(sessions: ListeningSession[], p: ChartPalette): EChar
     },
     xAxis: {
       type: 'category',
-      data: months,
+      data: eras.months,
       axisLine: { lineStyle: { color: p.axis } },
       axisTick: { show: false },
       axisLabel: { ...monoAxisLabel(p), formatter: (value: string) => formatMonth(value) },
@@ -231,16 +233,18 @@ export function erasOption(sessions: ListeningSession[], p: ChartPalette): EChar
   }
 }
 
-/** Average minutes per weekday (calendar-honest denominator). */
+/** Average listening per weekday in hours (calendar-honest denominator). */
 export function weekdayOption(stats: WeekdayStat[], p: ChartPalette): EChartsOption {
   const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   return {
-    grid: { left: 46, right: 12, top: 14, bottom: 28 },
+    grid: { left: 8, right: 12, top: 14, bottom: 28, containLabel: true },
     tooltip: {
       ...baseTooltip(p),
+      // Read the precise ms off the stat so the tooltip isn't limited to the
+      // rounded hours shown on the axis.
       formatter: (params: unknown) => {
-        const { dataIndex, value } = params as { dataIndex: number; value: number }
-        return `${labels[dataIndex]}: ${formatDuration(value * 60_000)} on average`
+        const { dataIndex } = params as { dataIndex: number }
+        return `${labels[dataIndex]}: ${formatDuration(stats[dataIndex]!.avgMs)} on average`
       },
     },
     xAxis: {
@@ -252,13 +256,13 @@ export function weekdayOption(stats: WeekdayStat[], p: ChartPalette): EChartsOpt
     },
     yAxis: {
       type: 'value',
-      axisLabel: { ...monoAxisLabel(p), formatter: '{value} min' },
+      axisLabel: { ...monoAxisLabel(p), formatter: '{value} h' },
       splitLine: { lineStyle: { color: p.split } },
     },
     series: [
       {
         type: 'bar',
-        data: stats.map((stat) => Math.round(stat.avgMs / 60_000)),
+        data: stats.map((stat) => stat.avgMs / HOUR_MS),
         barWidth: '55%',
         itemStyle: { color: p.accent, borderRadius: [4, 4, 0, 0] },
       },

@@ -4,7 +4,14 @@ import { isoDate } from '@/lib/ingest/normalize'
 import type { IsoDate, LibraryItem, ListeningSession } from '@/types/models'
 
 import type { BookStats } from './books'
-import { authorNarratorSankey, authorStats, monthlyAuthorHours, narratorStats, seriesStats } from './people'
+import {
+  authorNarratorSankey,
+  authorStats,
+  monthlyAuthorHours,
+  monthlySeriesHours,
+  narratorStats,
+  seriesStats,
+} from './people'
 
 const d = (s: string): IsoDate => isoDate(s)!
 
@@ -167,5 +174,60 @@ describe('authorNarratorSankey', () => {
     const sankey = authorNarratorSankey(books, 5)
     expect(sankey.links).toHaveLength(5)
     expect(sankey.nodes.filter((n) => n.name.startsWith('a:'))).toHaveLength(5)
+  })
+})
+
+describe('monthlySeriesHours', () => {
+  const saga = { asin: 'S_SAGA', title: 'The Saga' }
+  const universe = { asin: 'S_UNI', title: 'The Universe' }
+  // Saga has 2 owned books, Universe has 3 → Saga is the more specific one.
+  const books = [
+    book({ key: 'B0A', library: libraryItem({ asin: 'B0A', series: [saga, universe] }) }),
+    book({ key: 'B0B', library: libraryItem({ asin: 'B0B', series: [universe, saga] }) }),
+    book({ key: 'B0C', library: libraryItem({ asin: 'B0C', series: [universe] }) }),
+  ]
+  const s = (date: string, ms: number, asin: string): ListeningSession => ({
+    profile: 'Main',
+    startDate: d(date),
+    endDate: d(date),
+    durationMs: ms,
+    startPositionMs: 0,
+    endPositionMs: ms,
+    productName: asin,
+    asin,
+    bookLengthMs: null,
+    deliveryType: null,
+    narrationSpeed: null,
+    audioType: 'FullTitle',
+    listeningMode: null,
+    appVersion: null,
+    timezone: null,
+  })
+  const sessions = [
+    s('2024-01-05', HOUR, 'B0A'),
+    s('2024-01-06', 2 * HOUR, 'B0B'),
+    s('2024-02-01', HOUR, 'B0C'),
+    s('2024-01-10', 3 * HOUR, 'B0D'), // standalone — no library entry
+  ]
+
+  it('attributes books to their most specific series and gap-fills months', () => {
+    const eras = monthlySeriesHours(sessions, books, 8)
+    expect(eras.months).toEqual(['2024-01', '2024-02'])
+    // order-independent: B0B lists Universe first but still resolves to Saga
+    expect(eras.groups).toEqual([
+      { title: 'The Saga', data: [3, 0] },
+      { title: 'The Universe', data: [0, 1] },
+    ])
+    expect(eras.other).toEqual([3, 0]) // standalone B0D, in January
+  })
+
+  it('folds series beyond the top-N into "other"', () => {
+    const eras = monthlySeriesHours(sessions, books, 1)
+    expect(eras.groups.map((g) => g.title)).toEqual(['The Saga'])
+    expect(eras.other).toEqual([3, 1]) // standalone (Jan) + Universe (Feb)
+  })
+
+  it('returns an empty structure without sessions', () => {
+    expect(monthlySeriesHours([], books)).toEqual({ months: [], groups: [], other: [] })
   })
 })
