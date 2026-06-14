@@ -2,6 +2,7 @@
 import { useRouter } from "vue-router";
 
 import DarkToggle from "@/components/ui/DarkToggle.vue";
+import GithubLink from "@/components/ui/GithubLink.vue";
 import ProfileSwitcher from "@/components/ui/ProfileSwitcher.vue";
 import { useTakeoutStore } from "@/stores/takeout";
 
@@ -156,7 +157,10 @@ function clearData(): void {
           <ProfileSwitcher />
         </div>
         <div class="flex items-center justify-between">
-          <DarkToggle />
+          <div class="flex items-center gap-2">
+            <DarkToggle />
+            <GithubLink />
+          </div>
           <button
             v-if="takeout.hasData"
             type="button"
@@ -183,7 +187,10 @@ function clearData(): void {
             <img src="/logo.svg" alt="" class="h-7 w-7" />
             <span class="font-display text-ink-900 dark:text-paper-50 text-base font-semibold tracking-tight"> Audiotrail </span>
           </RouterLink>
-          <DarkToggle />
+          <div class="flex items-center gap-2">
+            <GithubLink />
+            <DarkToggle />
+          </div>
         </div>
         <nav v-if="takeout.hasData" class="flex [scrollbar-width:none] gap-1 overflow-x-auto px-3 pb-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <RouterLink v-for="item in [...explore, wrapped, about]" :key="item.to" :to="item.to" custom v-slot="{ href, navigate, isActive }">

@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
 import DarkToggle from "@/components/ui/DarkToggle.vue";
+import GithubLink from "@/components/ui/GithubLink.vue";
 import LoadReportPanel from "@/components/ui/LoadReportPanel.vue";
 import TakeoutSteps from "@/components/ui/TakeoutSteps.vue";
 import { useTakeoutStore } from "@/stores/takeout";
@@ -53,6 +54,7 @@ function openDashboard(): void {
       </div>
       <div class="flex items-center gap-3">
         <RouterLink to="/about" class="text-ink-600 dark:text-ink-300 text-sm font-medium underline-offset-4 hover:underline"> About </RouterLink>
+        <GithubLink />
         <DarkToggle />
       </div>
     </header>
