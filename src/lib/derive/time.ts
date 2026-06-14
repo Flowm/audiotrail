@@ -164,8 +164,8 @@ export interface WeekdayStat {
 }
 
 export function weekdayAverages(days: DayTotal[]): WeekdayStat[] {
-  const totals = new Array<number>(7).fill(0)
-  const counts = new Array<number>(7).fill(0)
+  const totals = Array.from({ length: 7 }, () => 0)
+  const counts = Array.from({ length: 7 }, () => 0)
   if (days.length > 0) {
     const first = epochDay(days[0]!.date)
     const last = epochDay(days[days.length - 1]!.date)

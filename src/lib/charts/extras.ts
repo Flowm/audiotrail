@@ -12,7 +12,7 @@ export function clickPositionOption(hits: SearchHit[], p: ChartPalette): ECharts
   if (clicked.length === 0) return null
 
   const MAX_POSITION = 10
-  const counts = new Array<number>(MAX_POSITION + 1).fill(0)
+  const counts = Array.from({ length: MAX_POSITION + 1 }, () => 0)
   for (const hit of clicked) {
     const bucket = Math.min(hit.position!, MAX_POSITION + 1) - 1
     counts[Math.min(bucket, MAX_POSITION)] += 1
