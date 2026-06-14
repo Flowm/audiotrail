@@ -4,7 +4,6 @@ import { useRouter } from "vue-router";
 
 import DarkToggle from "@/components/ui/DarkToggle.vue";
 import LoadReportPanel from "@/components/ui/LoadReportPanel.vue";
-import LogoMark from "@/components/ui/LogoMark.vue";
 import TakeoutSteps from "@/components/ui/TakeoutSteps.vue";
 import { useTakeoutStore } from "@/stores/takeout";
 
@@ -46,7 +45,7 @@ function openDashboard(): void {
   <div class="flex min-h-screen flex-col">
     <header class="flex items-center justify-between px-5 py-4 sm:px-8">
       <div class="flex items-center gap-2.5">
-        <LogoMark class="h-8 w-8" />
+        <img src="/logo.svg" alt="" class="h-8 w-8" />
         <span class="flex flex-col">
           <span class="font-display text-ink-900 dark:text-paper-50 text-lg font-semibold tracking-tight"> Audiotrail </span>
           <span class="text-ink-400 dark:text-ink-500 font-mono text-[9px] tracking-[0.25em] uppercase"> local · private </span>

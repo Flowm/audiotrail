@@ -2,7 +2,6 @@
 import { useRouter } from "vue-router";
 
 import DarkToggle from "@/components/ui/DarkToggle.vue";
-import LogoMark from "@/components/ui/LogoMark.vue";
 import ProfileSwitcher from "@/components/ui/ProfileSwitcher.vue";
 import { useTakeoutStore } from "@/stores/takeout";
 
@@ -71,7 +70,7 @@ function clearData(): void {
   <div class="min-h-screen lg:flex">
     <aside class="border-paper-200 bg-paper-100/60 dark:border-ink-800 dark:bg-ink-900/30 sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r lg:flex">
       <RouterLink to="/" class="flex items-center gap-2.5 px-5 pt-6">
-        <LogoMark class="h-8 w-8" />
+        <img src="/logo.svg" alt="" class="h-8 w-8" />
         <span class="flex flex-col">
           <span class="font-display text-ink-900 dark:text-paper-50 text-lg font-semibold tracking-tight"> Audiotrail </span>
           <span class="text-ink-400 dark:text-ink-500 font-mono text-[9px] tracking-[0.25em] uppercase"> local · private </span>
@@ -181,7 +180,7 @@ function clearData(): void {
       <header class="border-paper-200 bg-paper-50/90 dark:border-ink-800 dark:bg-ink-950/90 sticky top-0 z-40 border-b backdrop-blur lg:hidden">
         <div class="flex items-center justify-between px-4 py-3">
           <RouterLink to="/" class="flex items-center gap-2">
-            <LogoMark class="h-7 w-7" />
+            <img src="/logo.svg" alt="" class="h-7 w-7" />
             <span class="font-display text-ink-900 dark:text-paper-50 text-base font-semibold tracking-tight"> Audiotrail </span>
           </RouterLink>
           <DarkToggle />
