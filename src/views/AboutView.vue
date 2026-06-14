@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import TakeoutSteps from "@/components/ui/TakeoutSteps.vue";
 
+const buildSha = __BUILD_SHA__;
+const buildDate = __BUILD_DATE__.slice(0, 10);
+
 const datasets: Array<{ name: string; blurb: string }> = [
   { name: "Listening", blurb: "Every listening session, day by day — duration, position, device context." },
   { name: "Library", blurb: "Every title you own: authors, narrators, series, language, length." },
@@ -84,6 +87,7 @@ const datasets: Array<{ name: string; blurb: string }> = [
         Mono, self-hosted so the app makes no font-CDN requests. Opt-in cover art is resolved through the Audnexus API. Audiotrail is an independent project and is not affiliated
         with, endorsed by, or connected to Audible or Amazon; all trademarks belong to their owners.
       </p>
+      <p class="text-ink-400 dark:text-ink-500 mt-4 font-mono text-xs">Build {{ buildSha }} · {{ buildDate }}</p>
     </section>
   </div>
 </template>

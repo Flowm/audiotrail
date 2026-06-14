@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { execSync } from "node:child_process";
 import { createReadStream, existsSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -6,6 +7,9 @@ import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
+
+const buildDate = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+const buildSha = execSync("git rev-parse --short HEAD").toString().trim();
 
 /**
  * Serves the developer's own gitignored sample takeout (data/Audible.zip)
@@ -76,6 +80,10 @@ export default defineConfig({
   ],
   resolve: {
     tsconfigPaths: true,
+  },
+  define: {
+    __BUILD_DATE__: JSON.stringify(buildDate),
+    __BUILD_SHA__: JSON.stringify(buildSha),
   },
   build: {
     // echarts is one deliberate lazy-loaded chunk shared by all chart views;

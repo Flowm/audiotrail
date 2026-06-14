@@ -11,7 +11,8 @@
     "import/no-unassigned-import": ["warn", { "allow": ["**/*.css", "**/echarts"] }],
     "no-console": "off",
     "no-await-in-loop": "off",
-    "no-map-spread": "off"
+    "no-map-spread": "off",
+    "no-underscore-dangle": "off"
   },
   "env": {
     "builtin": true,
