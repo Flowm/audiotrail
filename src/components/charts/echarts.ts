@@ -1,22 +1,7 @@
-import {
-  BarChart,
-  HeatmapChart,
-  LineChart,
-  PieChart,
-  ScatterChart,
-  SankeyChart,
-} from 'echarts/charts'
-import {
-  CalendarComponent,
-  DataZoomComponent,
-  GridComponent,
-  LegendComponent,
-  MarkLineComponent,
-  TooltipComponent,
-  VisualMapComponent,
-} from 'echarts/components'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
+import { BarChart, HeatmapChart, LineChart, PieChart, ScatterChart, SankeyChart } from "echarts/charts";
+import { CalendarComponent, DataZoomComponent, GridComponent, LegendComponent, MarkLineComponent, TooltipComponent, VisualMapComponent } from "echarts/components";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
 
 /**
  * Single tree-shaken ECharts registration point. Imported once by BaseChart
@@ -37,4 +22,4 @@ use([
   CalendarComponent,
   MarkLineComponent,
   CanvasRenderer,
-])
+]);

@@ -1,44 +1,44 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 
-import DarkToggle from '@/components/ui/DarkToggle.vue'
-import LoadReportPanel from '@/components/ui/LoadReportPanel.vue'
-import LogoMark from '@/components/ui/LogoMark.vue'
-import TakeoutSteps from '@/components/ui/TakeoutSteps.vue'
-import { useTakeoutStore } from '@/stores/takeout'
+import DarkToggle from "@/components/ui/DarkToggle.vue";
+import LoadReportPanel from "@/components/ui/LoadReportPanel.vue";
+import LogoMark from "@/components/ui/LogoMark.vue";
+import TakeoutSteps from "@/components/ui/TakeoutSteps.vue";
+import { useTakeoutStore } from "@/stores/takeout";
 
-const takeout = useTakeoutStore()
-const router = useRouter()
+const takeout = useTakeoutStore();
+const router = useRouter();
 
-const isDev = import.meta.env.DEV
-const dragOver = ref(false)
-const fileInput = ref<HTMLInputElement | null>(null)
+const isDev = import.meta.env.DEV;
+const dragOver = ref(false);
+const fileInput = ref<HTMLInputElement | null>(null);
 
-const busy = computed(() => takeout.phase === 'reading' || takeout.phase === 'parsing')
-const showDropzone = computed(() => !busy.value && takeout.phase !== 'ready')
+const busy = computed(() => takeout.phase === "reading" || takeout.phase === "parsing");
+const showDropzone = computed(() => !busy.value && takeout.phase !== "ready");
 
 function onDrop(event: DragEvent): void {
-  dragOver.value = false
-  const file = event.dataTransfer?.files?.[0]
-  if (file) void takeout.loadFromFile(file)
+  dragOver.value = false;
+  const file = event.dataTransfer?.files?.[0];
+  if (file) void takeout.loadFromFile(file);
 }
 
 function onPick(event: Event): void {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (file) void takeout.loadFromFile(file)
-  input.value = ''
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (file) void takeout.loadFromFile(file);
+  input.value = "";
 }
 
 async function loadSample(): Promise<void> {
-  if (!import.meta.env.DEV) return
-  const { loadDevSample } = await import('@/dev/autoload')
-  await loadDevSample(takeout)
+  if (!import.meta.env.DEV) return;
+  const { loadDevSample } = await import("@/dev/autoload");
+  await loadDevSample(takeout);
 }
 
 function openDashboard(): void {
-  void router.push({ name: 'overview' })
+  void router.push({ name: "overview" });
 }
 </script>
 
@@ -48,36 +48,24 @@ function openDashboard(): void {
       <div class="flex items-center gap-2.5">
         <LogoMark class="h-8 w-8" />
         <span class="flex flex-col">
-          <span class="font-display text-lg font-semibold tracking-tight text-ink-900 dark:text-paper-50">
-            Audiotrail
-          </span>
-          <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-ink-400 dark:text-ink-500">
-            local · private
-          </span>
+          <span class="font-display text-ink-900 dark:text-paper-50 text-lg font-semibold tracking-tight"> Audiotrail </span>
+          <span class="text-ink-400 dark:text-ink-500 font-mono text-[9px] tracking-[0.25em] uppercase"> local · private </span>
         </span>
       </div>
       <div class="flex items-center gap-3">
-        <RouterLink
-          to="/about"
-          class="text-sm font-medium text-ink-600 underline-offset-4 hover:underline dark:text-ink-300"
-        >
-          About
-        </RouterLink>
+        <RouterLink to="/about" class="text-ink-600 dark:text-ink-300 text-sm font-medium underline-offset-4 hover:underline"> About </RouterLink>
         <DarkToggle />
       </div>
     </header>
 
     <main class="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center px-5 pt-10 pb-16 sm:pt-16">
       <p class="overline">Your private listening report</p>
-      <h1
-        class="mt-3 text-center font-display text-4xl font-semibold tracking-tight text-ink-900 sm:text-5xl dark:text-paper-50"
-      >
+      <h1 class="font-display text-ink-900 dark:text-paper-50 mt-3 text-center text-4xl font-semibold tracking-tight sm:text-5xl">
         Years of listening,<br />
         <span class="text-accent-600 dark:text-accent-400">none of it leaves this tab.</span>
       </h1>
-      <p class="mt-5 max-w-lg text-center text-[15px] leading-relaxed text-ink-500 dark:text-ink-400">
-        Audiotrail turns your Audible data takeout into an interactive dashboard — parsed entirely
-        in your browser. No uploads, no servers, no tracking.
+      <p class="text-ink-500 dark:text-ink-400 mt-5 max-w-lg text-center text-[15px] leading-relaxed">
+        Audiotrail turns your Audible data takeout into an interactive dashboard — parsed entirely in your browser. No uploads, no servers, no tracking.
       </p>
 
       <!-- Drop zone -->
@@ -85,9 +73,7 @@ function openDashboard(): void {
         v-if="showDropzone"
         :class="[
           'panel mt-10 flex w-full cursor-pointer flex-col items-center gap-3 border-2 border-dashed px-6 py-12 transition-colors',
-          dragOver
-            ? 'border-accent-500 bg-accent-600/5 dark:bg-accent-400/5'
-            : 'hover:border-ink-300 dark:hover:border-ink-600',
+          dragOver ? 'border-accent-500 bg-accent-600/5 dark:bg-accent-400/5' : 'hover:border-ink-300 dark:hover:border-ink-600',
         ]"
         role="button"
         tabindex="0"
@@ -100,7 +86,7 @@ function openDashboard(): void {
         @drop.prevent="onDrop"
       >
         <svg
-          class="h-10 w-10 text-ink-300 dark:text-ink-600"
+          class="text-ink-300 dark:text-ink-600 h-10 w-10"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -110,21 +96,13 @@ function openDashboard(): void {
         >
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
         </svg>
-        <p class="text-sm font-medium text-ink-700 dark:text-ink-200">
+        <p class="text-ink-700 dark:text-ink-200 text-sm font-medium">
           Drop
-          <code class="rounded bg-paper-200/70 px-1 py-0.5 font-mono text-[12px] dark:bg-ink-800">Audible.zip</code>
+          <code class="bg-paper-200/70 dark:bg-ink-800 rounded px-1 py-0.5 font-mono text-[12px]">Audible.zip</code>
           here — or click to browse
         </p>
-        <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-400 dark:text-ink-500">
-          parsed locally · nothing uploaded
-        </p>
-        <input
-          ref="fileInput"
-          type="file"
-          accept=".zip,application/zip"
-          class="hidden"
-          @change="onPick"
-        />
+        <p class="text-ink-400 dark:text-ink-500 font-mono text-[10px] tracking-[0.2em] uppercase">parsed locally · nothing uploaded</p>
+        <input ref="fileInput" type="file" accept=".zip,application/zip" class="hidden" @change="onPick" />
       </div>
 
       <p
@@ -137,7 +115,7 @@ function openDashboard(): void {
       <!-- Parse progress -->
       <div v-if="busy" class="panel mt-10 w-full px-6 py-10 text-center">
         <svg
-          class="mx-auto h-8 w-8 animate-spin text-accent-600 dark:text-accent-400"
+          class="text-accent-600 dark:text-accent-400 mx-auto h-8 w-8 animate-spin"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -146,15 +124,11 @@ function openDashboard(): void {
         >
           <path d="M21 12a9 9 0 1 1-6.2-8.56" />
         </svg>
-        <p class="mt-4 text-sm font-medium text-ink-700 dark:text-ink-200">
-          {{ takeout.phase === 'reading' ? 'Reading zip…' : 'Parsing your takeout…' }}
+        <p class="text-ink-700 dark:text-ink-200 mt-4 text-sm font-medium">
+          {{ takeout.phase === "reading" ? "Reading zip…" : "Parsing your takeout…" }}
         </p>
-        <p class="mt-1 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-400 dark:text-ink-500">
-          <template v-if="takeout.progress?.datasetLabel">
-            {{ takeout.progress.datasetLabel }} ({{ takeout.progress.index + 1 }}/{{
-              takeout.progress.total
-            }})
-          </template>
+        <p class="text-ink-400 dark:text-ink-500 mt-1 font-mono text-[11px] tracking-[0.16em] uppercase">
+          <template v-if="takeout.progress?.datasetLabel"> {{ takeout.progress.datasetLabel }} ({{ takeout.progress.index + 1 }}/{{ takeout.progress.total }}) </template>
           <template v-else>working…</template>
         </p>
       </div>
@@ -165,14 +139,14 @@ function openDashboard(): void {
         <div class="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
-            class="rounded-full bg-accent-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-700 dark:bg-accent-500 dark:text-ink-950 dark:hover:bg-accent-400"
+            class="bg-accent-600 hover:bg-accent-700 dark:bg-accent-500 dark:text-ink-950 dark:hover:bg-accent-400 rounded-full px-6 py-2.5 text-sm font-semibold text-white transition-colors"
             @click="openDashboard"
           >
             Open the dashboard →
           </button>
           <button
             type="button"
-            class="rounded-full px-4 py-2.5 text-sm font-medium text-ink-500 transition-colors hover:text-ink-900 dark:text-ink-400 dark:hover:text-ink-100"
+            class="text-ink-500 hover:text-ink-900 dark:text-ink-400 dark:hover:text-ink-100 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
             @click="takeout.clear()"
           >
             Load a different zip
@@ -184,7 +158,7 @@ function openDashboard(): void {
         <button
           v-if="isDev"
           type="button"
-          class="mt-4 rounded-full border border-dashed border-accent-400/60 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-accent-700 transition-colors hover:bg-accent-600/10 dark:text-accent-300"
+          class="border-accent-400/60 text-accent-700 hover:bg-accent-600/10 dark:text-accent-300 mt-4 rounded-full border border-dashed px-4 py-1.5 font-mono text-[11px] tracking-[0.14em] uppercase transition-colors"
           @click="loadSample"
         >
           dev · load local sample
@@ -194,19 +168,17 @@ function openDashboard(): void {
           <span
             v-for="chip in ['No uploads', 'No accounts', 'No analytics', 'Nothing stored']"
             :key="chip"
-            class="rounded-full border border-paper-200 bg-white/60 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-500 dark:border-ink-800 dark:bg-ink-900/60 dark:text-ink-400"
+            class="border-paper-200 text-ink-500 dark:border-ink-800 dark:bg-ink-900/60 dark:text-ink-400 rounded-full border bg-white/60 px-3 py-1 font-mono text-[10px] tracking-[0.16em] uppercase"
           >
             {{ chip }}
           </span>
         </div>
 
         <details class="panel group mt-10 w-full px-6 py-5">
-          <summary
-            class="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-ink-700 dark:text-ink-200"
-          >
+          <summary class="text-ink-700 dark:text-ink-200 flex cursor-pointer list-none items-center justify-between text-sm font-medium">
             How do I get my data?
             <svg
-              class="h-4 w-4 text-ink-400 transition-transform group-open:rotate-180"
+              class="text-ink-400 h-4 w-4 transition-transform group-open:rotate-180"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -225,9 +197,7 @@ function openDashboard(): void {
     </main>
 
     <footer class="px-5 pb-6 text-center">
-      <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-400 dark:text-ink-600">
-        Open source · not affiliated with Audible or Amazon
-      </p>
+      <p class="text-ink-400 dark:text-ink-600 font-mono text-[10px] tracking-[0.18em] uppercase">Open source · not affiliated with Audible or Amazon</p>
     </footer>
   </div>
 </template>

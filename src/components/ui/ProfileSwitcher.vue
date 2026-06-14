@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from "vue";
 
-import { useSettingsStore } from '@/stores/settings'
-import { useTakeoutStore } from '@/stores/takeout'
+import { useSettingsStore } from "@/stores/settings";
+import { useTakeoutStore } from "@/stores/takeout";
 
-const takeout = useTakeoutStore()
-const settings = useSettingsStore()
+const takeout = useTakeoutStore();
+const settings = useSettingsStore();
 
-const options = computed(() => ['all', ...takeout.profiles])
+const options = computed(() => ["all", ...takeout.profiles]);
 
 function label(profile: string): string {
-  return profile === 'all' ? 'All profiles' : profile
+  return profile === "all" ? "All profiles" : profile;
 }
 </script>
 

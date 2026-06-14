@@ -4,11 +4,11 @@
  */
 export interface VirtualFile {
   /** Path inside the takeout, '/'-separated, no leading slash. */
-  path: string
-  text(): Promise<string>
+  path: string;
+  text(): Promise<string>;
 }
 
 export interface FileProvider {
   /** All regular files in the takeout (directories excluded). */
-  list(): Promise<VirtualFile[]>
+  list(): Promise<VirtualFile[]>;
 }

@@ -1,132 +1,101 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref } from "vue";
 
-import BaseChart from '@/components/charts/BaseChart.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
-import SectionHeader from '@/components/ui/SectionHeader.vue'
-import StatCard from '@/components/ui/StatCard.vue'
-import { useChartTheme } from '@/composables/useChartTheme'
-import { useDataset } from '@/composables/useDataset'
-import { donutOption, type DonutSlice } from '@/lib/charts/donut'
-import {
-  erasOption,
-  rhythmOption,
-  sessionHistogramOption,
-  weekdayOption,
-  type RhythmGranularity,
-} from '@/lib/charts/listening'
-import { monthlySeriesHours } from '@/lib/derive/people'
-import {
-  biggestDays,
-  sessionLengthHistogram,
-  weekdayAverages,
-} from '@/lib/derive/time'
-import { formatDate, formatDuration, formatNumber } from '@/lib/format'
-import { useTakeoutStore } from '@/stores/takeout'
+import BaseChart from "@/components/charts/BaseChart.vue";
+import EmptyState from "@/components/ui/EmptyState.vue";
+import SectionHeader from "@/components/ui/SectionHeader.vue";
+import StatCard from "@/components/ui/StatCard.vue";
+import { useChartTheme } from "@/composables/useChartTheme";
+import { useDataset } from "@/composables/useDataset";
+import { donutOption, type DonutSlice } from "@/lib/charts/donut";
+import { erasOption, rhythmOption, sessionHistogramOption, weekdayOption, type RhythmGranularity } from "@/lib/charts/listening";
+import { monthlySeriesHours } from "@/lib/derive/people";
+import { biggestDays, sessionLengthHistogram, weekdayAverages } from "@/lib/derive/time";
+import { formatDate, formatDuration, formatNumber } from "@/lib/format";
+import { useTakeoutStore } from "@/stores/takeout";
 
-const takeout = useTakeoutStore()
-const palette = useChartTheme()
-const listening = useDataset('listening')
+const takeout = useTakeoutStore();
+const palette = useChartTheme();
+const listening = useDataset("listening");
 
-const sessions = computed(() => takeout.sessions)
-const days = computed(() => takeout.days)
-const books = computed(() => takeout.bookStats.books)
+const sessions = computed(() => takeout.sessions);
+const days = computed(() => takeout.days);
+const books = computed(() => takeout.bookStats.books);
 
-const granularity = ref<RhythmGranularity>('day')
+const granularity = ref<RhythmGranularity>("day");
 const granularities: { key: RhythmGranularity; label: string }[] = [
-  { key: 'day', label: 'Daily' },
-  { key: 'week', label: 'Weekly' },
-  { key: 'month', label: 'Monthly' },
-]
+  { key: "day", label: "Daily" },
+  { key: "week", label: "Weekly" },
+  { key: "month", label: "Monthly" },
+];
 
-const rhythm = computed(() =>
-  days.value.length > 0 ? rhythmOption(granularity.value, days.value, palette.value) : null,
-)
-const eras = computed(() =>
-  erasOption(monthlySeriesHours(sessions.value, books.value), palette.value),
-)
-const weekday = computed(() =>
-  days.value.length > 0 ? weekdayOption(weekdayAverages(days.value), palette.value) : null,
-)
-const histogram = computed(() =>
-  sessions.value.length > 0
-    ? sessionHistogramOption(sessionLengthHistogram(sessions.value), palette.value)
-    : null,
-)
-const topDays = computed(() => biggestDays(sessions.value, 10))
+const rhythm = computed(() => (days.value.length > 0 ? rhythmOption(granularity.value, days.value, palette.value) : null));
+const eras = computed(() => erasOption(monthlySeriesHours(sessions.value, books.value), palette.value));
+const weekday = computed(() => (days.value.length > 0 ? weekdayOption(weekdayAverages(days.value), palette.value) : null));
+const histogram = computed(() => (sessions.value.length > 0 ? sessionHistogramOption(sessionLengthHistogram(sessions.value), palette.value) : null));
+const topDays = computed(() => biggestDays(sessions.value, 10));
 
 // ----- habit aggregations ----------------------------------------------------
 
-function shareByMs(
-  pick: (session: (typeof sessions.value)[number]) => string | null,
-  rename?: (key: string) => string,
-): DonutSlice[] {
-  const byKey = new Map<string, number>()
+function shareByMs(pick: (session: (typeof sessions.value)[number]) => string | null, rename?: (key: string) => string): DonutSlice[] {
+  const byKey = new Map<string, number>();
   for (const session of sessions.value) {
-    const key = pick(session)
-    if (key === null) continue
-    byKey.set(key, (byKey.get(key) ?? 0) + session.durationMs)
+    const key = pick(session);
+    if (key === null) continue;
+    byKey.set(key, (byKey.get(key) ?? 0) + session.durationMs);
   }
-  return [...byKey.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([name, value]) => ({ name: rename ? rename(name) : name, value }))
+  return [...byKey.entries()].sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name: rename ? rename(name) : name, value }));
 }
 
-const deliveryShare = computed(() => shareByMs((s) => s.deliveryType))
-const modeShare = computed(() => shareByMs((s) => s.listeningMode))
+const deliveryShare = computed(() => shareByMs((s) => s.deliveryType));
+const modeShare = computed(() => shareByMs((s) => s.listeningMode));
 const speedShare = computed(() =>
   shareByMs(
     (s) => (s.narrationSpeed !== null ? s.narrationSpeed.toFixed(2) : null),
     (key) => `${Number(key)}×`,
   ),
-)
+);
 
-const hoursFmt = (value: number): string => formatDuration(value)
+const hoursFmt = (value: number): string => formatDuration(value);
 
 interface AppVersionRow {
-  version: string
-  sessions: number
-  first: string
-  last: string
+  version: string;
+  sessions: number;
+  first: string;
+  last: string;
 }
 
 const appVersions = computed<AppVersionRow[]>(() => {
-  const byVersion = new Map<string, { sessions: number; first: string; last: string }>()
+  const byVersion = new Map<string, { sessions: number; first: string; last: string }>();
   for (const session of sessions.value) {
-    if (session.appVersion === null) continue
-    const entry = byVersion.get(session.appVersion)
+    if (session.appVersion === null) continue;
+    const entry = byVersion.get(session.appVersion);
     if (!entry) {
       byVersion.set(session.appVersion, {
         sessions: 1,
         first: session.startDate,
         last: session.startDate,
-      })
+      });
     } else {
-      entry.sessions += 1
-      if (session.startDate < entry.first) entry.first = session.startDate
-      if (session.startDate > entry.last) entry.last = session.startDate
+      entry.sessions += 1;
+      if (session.startDate < entry.first) entry.first = session.startDate;
+      if (session.startDate > entry.last) entry.last = session.startDate;
     }
   }
   return [...byVersion.entries()]
     .map(([version, entry]) => ({ version, ...entry }))
     .sort((a, b) => (a.first < b.first ? 1 : -1))
-    .slice(0, 10)
-})
+    .slice(0, 10);
+});
 
-const avgPerActiveDay = computed(() =>
-  days.value.length > 0
-    ? days.value.reduce((sum, day) => sum + day.ms, 0) / days.value.length
-    : 0,
-)
+const avgPerActiveDay = computed(() => (days.value.length > 0 ? days.value.reduce((sum, day) => sum + day.ms, 0) / days.value.length : 0));
 </script>
 
 <template>
   <div class="space-y-10">
     <section>
       <p class="overline">№ 02 · Time</p>
-      <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-ink-900 dark:text-paper-50">
-        Listening
-      </h1>
+      <h1 class="font-display text-ink-900 dark:text-paper-50 mt-2 text-3xl font-semibold tracking-tight">Listening</h1>
     </section>
 
     <template v-if="listening.available.value && sessions.length > 0">
@@ -134,11 +103,7 @@ const avgPerActiveDay = computed(() =>
         <StatCard label="Sessions" :value="formatNumber(sessions.length)" />
         <StatCard label="Active days" :value="formatNumber(days.length)" />
         <StatCard label="Avg per active day" :value="formatDuration(avgPerActiveDay)" />
-        <StatCard
-          label="Biggest day"
-          :value="topDays[0] ? formatDuration(topDays[0].ms) : '—'"
-          :sub="topDays[0] ? formatDate(topDays[0].date) : null"
-        />
+        <StatCard label="Biggest day" :value="topDays[0] ? formatDuration(topDays[0].ms) : '—'" :sub="topDays[0] ? formatDate(topDays[0].date) : null" />
       </section>
 
       <section class="space-y-3">
@@ -190,23 +155,19 @@ const avgPerActiveDay = computed(() =>
 
       <section class="space-y-3">
         <SectionHeader title="Biggest days" hint="top 10" />
-        <div class="panel divide-y divide-paper-200/70 px-5 dark:divide-ink-800/70">
-          <div
-            v-for="(day, index) in topDays"
-            :key="day.date"
-            class="flex items-baseline gap-4 py-2.5"
-          >
-            <span class="w-6 shrink-0 font-mono text-[11px] text-ink-400 dark:text-ink-500">
-              {{ String(index + 1).padStart(2, '0') }}
+        <div class="panel divide-paper-200/70 dark:divide-ink-800/70 divide-y px-5">
+          <div v-for="(day, index) in topDays" :key="day.date" class="flex items-baseline gap-4 py-2.5">
+            <span class="text-ink-400 dark:text-ink-500 w-6 shrink-0 font-mono text-[11px]">
+              {{ String(index + 1).padStart(2, "0") }}
             </span>
-            <span class="w-28 shrink-0 text-sm font-medium text-ink-800 dark:text-ink-100">
+            <span class="text-ink-800 dark:text-ink-100 w-28 shrink-0 text-sm font-medium">
               {{ formatDate(day.date) }}
             </span>
-            <span class="w-20 shrink-0 font-mono text-xs text-accent-700 dark:text-accent-300">
+            <span class="text-accent-700 dark:text-accent-300 w-20 shrink-0 font-mono text-xs">
               {{ formatDuration(day.ms) }}
             </span>
-            <span class="min-w-0 flex-1 truncate text-xs text-ink-500 dark:text-ink-400">
-              {{ day.topProducts.join(' · ') }}
+            <span class="text-ink-500 dark:text-ink-400 min-w-0 flex-1 truncate text-xs">
+              {{ day.topProducts.join(" · ") }}
             </span>
           </div>
         </div>
@@ -216,41 +177,30 @@ const avgPerActiveDay = computed(() =>
         <SectionHeader title="Habits" hint="share of listening time" />
         <div class="grid gap-3 sm:grid-cols-3">
           <div class="panel p-3">
-            <p class="overline px-2 pt-1">Delivery</p>
+            <p class="px-2 pt-1 overline">Delivery</p>
             <BaseChart :option="deliveryShare.length ? donutOption(deliveryShare, palette, hoursFmt) : null" :height="210" />
           </div>
           <div class="panel p-3">
-            <p class="overline px-2 pt-1">Connection</p>
+            <p class="px-2 pt-1 overline">Connection</p>
             <BaseChart :option="modeShare.length ? donutOption(modeShare, palette, hoursFmt) : null" :height="210" />
           </div>
           <div class="panel p-3">
-            <p class="overline px-2 pt-1">Narration speed</p>
+            <p class="px-2 pt-1 overline">Narration speed</p>
             <BaseChart :option="speedShare.length ? donutOption(speedShare, palette, hoursFmt) : null" :height="210" />
           </div>
         </div>
         <div class="panel px-5 py-4">
           <p class="overline">App versions</p>
           <div class="mt-3 grid gap-x-8 gap-y-1.5 sm:grid-cols-2">
-            <div
-              v-for="row in appVersions"
-              :key="row.version"
-              class="flex items-baseline justify-between gap-3 text-xs"
-            >
-              <span class="font-mono text-ink-700 dark:text-ink-200">v{{ row.version }}</span>
-              <span class="text-ink-400 dark:text-ink-500">
-                {{ formatDate(row.first) }} — {{ formatDate(row.last) }} ·
-                {{ formatNumber(row.sessions) }} sessions
-              </span>
+            <div v-for="row in appVersions" :key="row.version" class="flex items-baseline justify-between gap-3 text-xs">
+              <span class="text-ink-700 dark:text-ink-200 font-mono">v{{ row.version }}</span>
+              <span class="text-ink-400 dark:text-ink-500"> {{ formatDate(row.first) }} — {{ formatDate(row.last) }} · {{ formatNumber(row.sessions) }} sessions </span>
             </div>
           </div>
         </div>
       </section>
     </template>
 
-    <EmptyState
-      v-else
-      title="No listening history in this takeout"
-      message="Without Audible.Listening there is no time data to explore."
-    />
+    <EmptyState v-else title="No listening history in this takeout" message="Without Audible.Listening there is no time data to explore." />
   </div>
 </template>

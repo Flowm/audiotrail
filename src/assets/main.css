@@ -1,15 +1,15 @@
-@import '@fontsource-variable/fraunces';
-@import '@fontsource-variable/schibsted-grotesk';
-@import '@fontsource/ibm-plex-mono/400.css';
-@import '@fontsource/ibm-plex-mono/500.css';
-@import 'tailwindcss';
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/schibsted-grotesk";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: "Schibsted Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --color-paper-50: #faf8f4;
   --color-paper-100: #f4f0e8;
@@ -95,12 +95,12 @@
   }
 
   body {
-    @apply bg-paper-50 font-sans text-ink-800 antialiased dark:bg-ink-950 dark:text-ink-100;
+    @apply bg-paper-50 text-ink-800 dark:bg-ink-950 dark:text-ink-100 font-sans antialiased;
   }
 
   /* Print-grain overlay: part of the "liner notes" look. */
   body::after {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
     z-index: 60;
@@ -125,10 +125,10 @@
 @layer components {
   /* Editorial micro-label above headings — part of the report identity. */
   .overline {
-    @apply font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-ink-400 dark:text-ink-500;
+    @apply text-ink-400 dark:text-ink-500 font-mono text-[10px] font-medium tracking-[0.22em] uppercase;
   }
 
   .panel {
-    @apply rounded-2xl border border-paper-200 bg-white/70 dark:border-ink-800 dark:bg-ink-900/60;
+    @apply border-paper-200 dark:border-ink-800 dark:bg-ink-900/60 rounded-2xl border bg-white/70;
   }
 }

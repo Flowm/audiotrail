@@ -1,56 +1,48 @@
-import type { EChartsOption } from 'echarts'
+import type { EChartsOption } from "echarts";
 
-import { formatDate, formatNumber } from '@/lib/format'
+import { formatDate, formatNumber } from "@/lib/format";
+import type { IsoDate } from "@/types/models";
 
-import type { IsoDate } from '@/types/models'
-
-import { baseTooltip, monoAxisLabel, withAlpha } from './common'
-
-import type { ChartPalette } from './types'
+import { baseTooltip, monoAxisLabel, withAlpha } from "./common";
+import type { ChartPalette } from "./types";
 
 /** All-time cumulative listening hours area chart. */
-export function cumulativeHoursOption(
-  cumulativeDays: { date: IsoDate; cumMs: number }[],
-  p: ChartPalette,
-): EChartsOption {
-  const data = cumulativeDays.map((day) => [
-    Date.parse(`${day.date}T00:00:00Z`),
-    Math.round((day.cumMs / 3_600_000) * 10) / 10,
-  ])
+export function cumulativeHoursOption(cumulativeDays: { date: IsoDate; cumMs: number }[], p: ChartPalette): EChartsOption {
+  const data = cumulativeDays.map((day) => [Date.parse(`${day.date}T00:00:00Z`), Math.round((day.cumMs / 3_600_000) * 10) / 10]);
 
   return {
     grid: { left: 50, right: 16, top: 16, bottom: 30 },
     tooltip: {
       ...baseTooltip(p),
-      trigger: 'axis',
+      trigger: "axis",
       formatter: (params: unknown) => {
-        const [first] = params as { value: [number, number] }[]
-        if (!first) return ''
-        return `${formatDate(first.value[0])} — ${formatNumber(first.value[1])} h total`
+        const [first] = params as { value: [number, number] }[];
+        if (!first) return "";
+        return `${formatDate(first.value[0])} — ${formatNumber(first.value[1])} h total`;
       },
     },
     xAxis: {
-      type: 'time',
+      type: "time",
       axisLine: { lineStyle: { color: p.axis } },
       axisTick: { show: false },
       axisLabel: monoAxisLabel(p),
       splitLine: { show: false },
     },
     yAxis: {
-      type: 'value',
+      type: "value",
       axisLabel: { ...monoAxisLabel(p), formatter: (value: number) => `${formatNumber(value)} h` },
       splitLine: { lineStyle: { color: p.split } },
     },
     series: [
       {
-        type: 'line',
+        type: "line",
         data,
         showSymbol: false,
         lineStyle: { color: p.accent, width: 2 },
         itemStyle: { color: p.accent },
         areaStyle: {
           color: {
-            type: 'linear',
+            type: "linear",
             x: 0,
             y: 0,
             x2: 0,
@@ -63,5 +55,5 @@ export function cumulativeHoursOption(
         },
       },
     ],
-  }
+  };
 }

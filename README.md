@@ -5,7 +5,7 @@
 Audible's GDPR data takeout is a zip full of CSV files: technically yours, practically
 unreadable. Audiotrail turns it into an interactive dashboard — your listening rhythm
 across the years, the books you abandoned at 90%, what a listening hour actually cost
-you, and a yearly *Wrapped* story to top it off.
+you, and a yearly _Wrapped_ story to top it off.
 
 ## Privacy, in concrete terms
 
@@ -23,7 +23,7 @@ you, and a yearly *Wrapped* story to top it off.
 ## Get your takeout
 
 1. Sign in to your Amazon / Audible account.
-2. Go to *Manage your data* → *Request your data* → *Audible*.
+2. Go to _Manage your data_ → _Request your data_ → _Audible_.
 3. Amazon emails you a download link. According to their notice this can take up to a
    month.
 4. Drop the resulting `Audible.zip` onto Audiotrail.

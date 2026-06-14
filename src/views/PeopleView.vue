@@ -1,48 +1,38 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref } from "vue";
 
-import BaseChart from '@/components/charts/BaseChart.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
-import PersonLeaderboard from '@/components/ui/PersonLeaderboard.vue'
-import SectionHeader from '@/components/ui/SectionHeader.vue'
-import { useChartTheme } from '@/composables/useChartTheme'
-import { useDataset } from '@/composables/useDataset'
-import { authorErasOption } from '@/lib/charts/people'
-import { sankeyOption } from '@/lib/charts/sankey'
-import {
-  authorNarratorSankey,
-  authorStats,
-  monthlyAuthorHours,
-  narratorStats,
-  seriesStats,
-} from '@/lib/derive/people'
-import { formatDuration, formatNumber } from '@/lib/format'
-import { useTakeoutStore } from '@/stores/takeout'
+import BaseChart from "@/components/charts/BaseChart.vue";
+import EmptyState from "@/components/ui/EmptyState.vue";
+import PersonLeaderboard from "@/components/ui/PersonLeaderboard.vue";
+import SectionHeader from "@/components/ui/SectionHeader.vue";
+import { useChartTheme } from "@/composables/useChartTheme";
+import { useDataset } from "@/composables/useDataset";
+import { authorErasOption } from "@/lib/charts/people";
+import { sankeyOption } from "@/lib/charts/sankey";
+import { authorNarratorSankey, authorStats, monthlyAuthorHours, narratorStats, seriesStats } from "@/lib/derive/people";
+import { formatDuration, formatNumber } from "@/lib/format";
+import { useTakeoutStore } from "@/stores/takeout";
 
-const takeout = useTakeoutStore()
-const palette = useChartTheme()
-const libraryAvailability = useDataset('library')
+const takeout = useTakeoutStore();
+const palette = useChartTheme();
+const libraryAvailability = useDataset("library");
 
-const books = computed(() => takeout.bookStats.books)
-const authors = computed(() => authorStats(books.value))
-const narrators = computed(() => narratorStats(books.value))
-const series = computed(() => seriesStats(books.value))
+const books = computed(() => takeout.bookStats.books);
+const authors = computed(() => authorStats(books.value));
+const narrators = computed(() => narratorStats(books.value));
+const series = computed(() => seriesStats(books.value));
 
-const metric = ref<'hours' | 'books'>('hours')
+const metric = ref<"hours" | "books">("hours");
 
-const topNarrator = computed(() => narrators.value[0] ?? null)
+const topNarrator = computed(() => narrators.value[0] ?? null);
 
-const eras = computed(() =>
-  authorErasOption(monthlyAuthorHours(takeout.sessions, books.value, 5), palette.value),
-)
+const eras = computed(() => authorErasOption(monthlyAuthorHours(takeout.sessions, books.value, 5), palette.value));
 const sankey = computed(() => {
-  const data = authorNarratorSankey(books.value, 10)
-  return data.links.length > 0
-    ? sankeyOption(data, palette.value, (value) => `${value} h`)
-    : null
-})
+  const data = authorNarratorSankey(books.value, 10);
+  return data.links.length > 0 ? sankeyOption(data, palette.value, (value) => `${value} h`) : null;
+});
 
-const hasPeople = computed(() => authors.value.length > 0 || narrators.value.length > 0)
+const hasPeople = computed(() => authors.value.length > 0 || narrators.value.length > 0);
 </script>
 
 <template>
@@ -50,13 +40,8 @@ const hasPeople = computed(() => authors.value.length > 0 || narrators.value.len
     <section>
       <p class="overline">№ 04 · Voices</p>
       <div class="mt-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h1 class="font-display text-3xl font-semibold tracking-tight text-ink-900 dark:text-paper-50">
-          People
-        </h1>
-        <p
-          v-if="topNarrator"
-          class="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-400 dark:text-ink-500"
-        >
+        <h1 class="font-display text-ink-900 dark:text-paper-50 text-3xl font-semibold tracking-tight">People</h1>
+        <p v-if="topNarrator" class="text-ink-400 dark:text-ink-500 font-mono text-[10px] tracking-[0.16em] uppercase">
           the voice in your head: {{ formatDuration(topNarrator.totalMs) }} of
           {{ topNarrator.name }}
         </p>
@@ -69,7 +54,7 @@ const hasPeople = computed(() => authors.value.length > 0 || narrators.value.len
           <SectionHeader title="Leaderboards" hint="authors & narrators" />
           <div class="flex gap-1">
             <button
-              v-for="option in (['hours', 'books'] as const)"
+              v-for="option in ['hours', 'books'] as const"
               :key="option"
               type="button"
               :class="[
@@ -86,11 +71,11 @@ const hasPeople = computed(() => authors.value.length > 0 || narrators.value.len
         </div>
         <div class="grid gap-3 lg:grid-cols-2">
           <div class="panel px-5 py-4">
-            <p class="overline pb-3">Authors</p>
+            <p class="pb-3 overline">Authors</p>
             <PersonLeaderboard :people="authors" :metric="metric" />
           </div>
           <div class="panel px-5 py-4">
-            <p class="overline pb-3">Narrators</p>
+            <p class="pb-3 overline">Narrators</p>
             <PersonLeaderboard :people="narrators" :metric="metric" />
           </div>
         </div>
@@ -120,43 +105,38 @@ const hasPeople = computed(() => authors.value.length > 0 || narrators.value.len
         <div class="panel overflow-x-auto">
           <table class="w-full min-w-[560px] text-left text-sm">
             <thead>
-              <tr class="border-b border-paper-200 dark:border-ink-800">
-                <th class="overline px-4 py-2.5">Series</th>
-                <th class="overline px-4 py-2.5">Owned</th>
-                <th class="overline px-4 py-2.5">Started</th>
-                <th class="overline px-4 py-2.5">Finished</th>
-                <th class="overline px-4 py-2.5">Hours</th>
-                <th class="overline px-4 py-2.5">Progress</th>
+              <tr class="border-paper-200 dark:border-ink-800 border-b">
+                <th class="px-4 py-2.5 overline">Series</th>
+                <th class="px-4 py-2.5 overline">Owned</th>
+                <th class="px-4 py-2.5 overline">Started</th>
+                <th class="px-4 py-2.5 overline">Finished</th>
+                <th class="px-4 py-2.5 overline">Hours</th>
+                <th class="px-4 py-2.5 overline">Progress</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-paper-200/60 dark:divide-ink-800/60">
+            <tbody class="divide-paper-200/60 dark:divide-ink-800/60 divide-y">
               <tr v-for="entry in series" :key="entry.key">
-                <td class="max-w-[280px] truncate px-4 py-2 font-medium text-ink-800 dark:text-ink-100" :title="entry.title">
+                <td class="text-ink-800 dark:text-ink-100 max-w-[280px] truncate px-4 py-2 font-medium" :title="entry.title">
                   {{ entry.title }}
                 </td>
-                <td class="px-4 py-2 font-mono text-xs text-ink-500 dark:text-ink-400">
+                <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs">
                   {{ entry.owned }}
                 </td>
-                <td class="px-4 py-2 font-mono text-xs text-ink-500 dark:text-ink-400">
+                <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs">
                   {{ entry.started }}
                 </td>
-                <td class="px-4 py-2 font-mono text-xs text-ink-500 dark:text-ink-400">
+                <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs">
                   {{ entry.finished }}
                 </td>
-                <td class="px-4 py-2 font-mono text-xs text-ink-700 dark:text-ink-200">
-                  {{ entry.totalMs > 0 ? formatDuration(entry.totalMs) : '—' }}
+                <td class="text-ink-700 dark:text-ink-200 px-4 py-2 font-mono text-xs">
+                  {{ entry.totalMs > 0 ? formatDuration(entry.totalMs) : "—" }}
                 </td>
                 <td class="px-4 py-2">
                   <div class="flex items-center gap-2">
-                    <span class="h-1.5 w-24 overflow-hidden rounded-full bg-paper-200 dark:bg-ink-800">
-                      <span
-                        class="block h-full rounded-full bg-accent-500"
-                        :style="{ width: `${entry.owned > 0 ? Math.round((entry.finished / entry.owned) * 100) : 0}%` }"
-                      />
+                    <span class="bg-paper-200 dark:bg-ink-800 h-1.5 w-24 overflow-hidden rounded-full">
+                      <span class="bg-accent-500 block h-full rounded-full" :style="{ width: `${entry.owned > 0 ? Math.round((entry.finished / entry.owned) * 100) : 0}%` }" />
                     </span>
-                    <span class="font-mono text-[11px] text-ink-500 dark:text-ink-400">
-                      {{ entry.finished }}/{{ entry.owned }}
-                    </span>
+                    <span class="text-ink-500 dark:text-ink-400 font-mono text-[11px]"> {{ entry.finished }}/{{ entry.owned }} </span>
                   </div>
                 </td>
               </tr>
@@ -166,10 +146,6 @@ const hasPeople = computed(() => authors.value.length > 0 || narrators.value.len
       </section>
     </template>
 
-    <EmptyState
-      v-else
-      title="No people data"
-      message="Authors and narrators come from the library dataset, which is missing or empty in this takeout."
-    />
+    <EmptyState v-else title="No people data" message="Authors and narrators come from the library dataset, which is missing or empty in this takeout." />
   </div>
 </template>

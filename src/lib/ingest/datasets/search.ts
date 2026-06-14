@@ -1,25 +1,24 @@
-import type { SearchHit, SearchSession } from '@/types/models'
-import type { RawSearchHitRow, RawSearchSessionRow } from '@/types/raw'
+import type { SearchHit, SearchSession } from "@/types/models";
+import type { RawSearchHitRow, RawSearchSessionRow } from "@/types/raw";
 
-import { parseCsv } from '../csv'
-import { epochMs, int, isoDate, sentinel, yesNo } from '../normalize'
-
-import type { DatasetDescriptor } from './descriptor'
+import { parseCsv } from "../csv";
+import { epochMs, int, isoDate, sentinel, yesNo } from "../normalize";
+import type { DatasetDescriptor } from "./descriptor";
 
 export const searchSessionsDataset: DatasetDescriptor = {
-  key: 'searchSessions',
-  label: 'Search sessions',
+  key: "searchSessions",
+  label: "Search sessions",
   match: /SearchData_Tommy_Group\/[^/]*\.csv$/i,
 
   async parse(files) {
-    const warnings: string[] = []
-    const searchSessions: SearchSession[] = []
+    const warnings: string[] = [];
+    const searchSessions: SearchSession[] = [];
 
     for (const file of files) {
-      const { rows, warnings: csvWarnings } = parseCsv(await file.text())
-      warnings.push(...csvWarnings.map((warning) => `${file.path}: ${warning}`))
+      const { rows, warnings: csvWarnings } = parseCsv(await file.text());
+      warnings.push(...csvWarnings.map((warning) => `${file.path}: ${warning}`));
       for (const raw of rows) {
-        const row = raw as RawSearchSessionRow
+        const row = raw as RawSearchSessionRow;
         searchSessions.push({
           keywords: sentinel(row.keywords),
           date: isoDate(row.partition_date),
@@ -44,29 +43,29 @@ export const searchSessionsDataset: DatasetDescriptor = {
           firstClickedName: sentinel(row.first_clicked_product_name),
           firstPurchasedAsin: sentinel(row.first_purchased_asin),
           firstPurchasedName: sentinel(row.first_purchase_product_name),
-        })
+        });
       }
     }
 
-    searchSessions.sort((a, b) => (a.firstSearchAt ?? 0) - (b.firstSearchAt ?? 0))
-    return { patch: { searchSessions }, rows: searchSessions.length, warnings }
+    searchSessions.sort((a, b) => (a.firstSearchAt ?? 0) - (b.firstSearchAt ?? 0));
+    return { patch: { searchSessions }, rows: searchSessions.length, warnings };
   },
-}
+};
 
 export const searchHitsDataset: DatasetDescriptor = {
-  key: 'searchHits',
-  label: 'Search results',
+  key: "searchHits",
+  label: "Search results",
   match: /SearchData_Tommy_ASIN\/[^/]*\.csv$/i,
 
   async parse(files) {
-    const warnings: string[] = []
-    const searchHits: SearchHit[] = []
+    const warnings: string[] = [];
+    const searchHits: SearchHit[] = [];
 
     for (const file of files) {
-      const { rows, warnings: csvWarnings } = parseCsv(await file.text())
-      warnings.push(...csvWarnings.map((warning) => `${file.path}: ${warning}`))
+      const { rows, warnings: csvWarnings } = parseCsv(await file.text());
+      warnings.push(...csvWarnings.map((warning) => `${file.path}: ${warning}`));
       for (const raw of rows) {
-        const row = raw as RawSearchHitRow
+        const row = raw as RawSearchHitRow;
         // The yes/no flags are unreliable (all 'no' in real takeouts even for
         // clicked results) — the num_* counters carry the actual signal.
         searchHits.push({
@@ -86,11 +85,11 @@ export const searchHitsDataset: DatasetDescriptor = {
           deviceType: sentinel(row.device_type),
           os: sentinel(row.operating_system_name),
           searchType: sentinel(row.search_type),
-        })
+        });
       }
     }
 
-    searchHits.sort((a, b) => (a.searchAt ?? 0) - (b.searchAt ?? 0))
-    return { patch: { searchHits }, rows: searchHits.length, warnings }
+    searchHits.sort((a, b) => (a.searchAt ?? 0) - (b.searchAt ?? 0));
+    return { patch: { searchHits }, rows: searchHits.length, warnings };
   },
-}
+};
