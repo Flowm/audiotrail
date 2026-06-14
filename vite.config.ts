@@ -1,7 +1,6 @@
 /// <reference types="vitest/config" />
 import { createReadStream, existsSync, statSync } from "node:fs";
 import { resolve } from "node:path";
-import { fileURLToPath, URL } from "node:url";
 
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
@@ -76,21 +75,24 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-    },
+    tsconfigPaths: true,
   },
   build: {
     // echarts is one deliberate lazy-loaded chunk shared by all chart views;
     // it never blocks the upload page. ~245 kB gzip is its expected size.
     chunkSizeWarningLimit: 800,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         // Vite 8 runs on Rolldown, where the object form of manualChunks is
         // gone; codeSplitting.groups is its replacement. captured modules pull
         // in their deps by default, so echarts' zrender lands here too.
         codeSplitting: {
-          groups: [{ name: "echarts", test: /[\\/]node_modules[\\/](echarts|vue-echarts)[\\/]/ }],
+          groups: [
+            { name: "vue", test: /@vue|vue-router|pinia|@vueuse/, priority: 60 },
+            { name: "echarts", test: /echarts|vue-echarts/, priority: 30 },
+            { name: "vendor", test: /node_modules/, priority: 10 },
+            { name: "app", test: /src/, priority: 1 },
+          ],
         },
       },
     },

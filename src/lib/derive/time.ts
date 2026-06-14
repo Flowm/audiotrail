@@ -161,10 +161,12 @@ export function weekdayAverages(days: DayTotal[]): WeekdayStat[] {
     const first = epochDay(days[0]!.date);
     const last = epochDay(days[days.length - 1]!.date);
     for (let day = first; day <= last; day += 1) {
-      counts[(day + 3) % 7] += 1;
+      const weekday = (day + 3) % 7;
+      counts[weekday] = counts[weekday]! + 1;
     }
     for (const day of days) {
-      totals[weekdayOf(day.date)] += day.ms;
+      const weekday = weekdayOf(day.date);
+      totals[weekday] = totals[weekday]! + day.ms;
     }
   }
   return totals.map((totalMs, weekday) => ({

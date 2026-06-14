@@ -14,7 +14,8 @@ export function clickPositionOption(hits: SearchHit[], p: ChartPalette): ECharts
   const counts = Array.from({ length: MAX_POSITION + 1 }, () => 0);
   for (const hit of clicked) {
     const bucket = Math.min(hit.position!, MAX_POSITION + 1) - 1;
-    counts[Math.min(bucket, MAX_POSITION)] += 1;
+    const bucketIndex = Math.min(bucket, MAX_POSITION);
+    counts[bucketIndex] = counts[bucketIndex]! + 1;
   }
   const labels = [...Array.from({ length: MAX_POSITION }, (_, i) => `#${i + 1}`), `#${MAX_POSITION + 1}+`];
 
