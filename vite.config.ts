@@ -6,6 +6,7 @@ import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 import { defineConfig, type Plugin } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 
 /**
  * Serves the developer's own gitignored sample takeout (data/Audible.zip)
@@ -37,7 +38,43 @@ function sampleZipPlugin(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [vue(), tailwindcss(), sampleZipPlugin()],
+  plugins: [
+    vue(),
+    tailwindcss(),
+    sampleZipPlugin(),
+    VitePWA({
+      registerType: "prompt",
+      manifest: {
+        name: "Audiotrail",
+        short_name: "Audiotrail",
+        description: "Turn your Audible data takeout into a private dashboard, parsed entirely in your browser.",
+        theme_color: "#c96a15",
+        background_color: "#faf8f4",
+        display: "standalone",
+        start_url: "/",
+        scope: "/",
+        id: "audiotrail",
+        orientation: "natural",
+      },
+      workbox: {
+        // Precache only the built app shell. User-imported Audible data is never
+        // a network resource, so it is never cached by the service worker.
+        globPatterns: ["**/*.{js,css,html,svg,png,ico,woff,woff2}"],
+      },
+      pwaAssets: {
+        htmlPreset: "2023",
+        preset: {
+          transparent: { sizes: [64, 192, 512], favicons: [[48, "favicon.ico"]] },
+          maskable: { sizes: [512], padding: 0.15, resizeOptions: { background: "#c96a15" } },
+          apple: { sizes: [180], padding: 0.15, resizeOptions: { background: "#c96a15" } },
+        },
+        image: "public/logo.svg",
+      },
+      devOptions: {
+        type: "module",
+      },
+    }),
+  ],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

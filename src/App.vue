@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 
 import AppShell from "@/components/layout/AppShell.vue";
+import PWAUpdateBar from "@/components/ui/PWAUpdateBar.vue";
 import { useSettingsStore } from "@/stores/settings";
 
 // Instantiating the store applies the persisted dark-mode class immediately.
@@ -17,4 +18,5 @@ const bare = computed(() => route.meta.layout === "bare");
     <RouterView />
   </AppShell>
   <RouterView v-else />
+  <PWAUpdateBar />
 </template>
