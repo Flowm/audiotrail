@@ -12,26 +12,26 @@
     "typecheck": "vue-tsc -b"
   },
   "dependencies": {
-    "@fontsource-variable/fraunces": "^5.2.5",
-    "@fontsource-variable/schibsted-grotesk": "^5.2.5",
-    "@fontsource/ibm-plex-mono": "^5.2.5",
-    "echarts": "^5.6.0",
+    "@fontsource-variable/fraunces": "^5.2.9",
+    "@fontsource-variable/schibsted-grotesk": "^5.2.8",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "echarts": "^6.1.0",
     "jszip": "^3.10.1",
-    "papaparse": "^5.5.2",
-    "pinia": "^3.0.2",
-    "vue": "^3.5.13",
-    "vue-echarts": "^7.0.3",
-    "vue-router": "^4.5.1"
+    "papaparse": "^5.5.3",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.38",
+    "vue-echarts": "^8.0.1",
+    "vue-router": "^5.1.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.7",
-    "@types/node": "^22.15.0",
-    "@types/papaparse": "^5.3.15",
-    "@vitejs/plugin-vue": "^5.2.3",
-    "tailwindcss": "^4.1.7",
-    "typescript": "~5.8.3",
-    "vite": "^6.3.5",
-    "vitest": "^3.1.4",
-    "vue-tsc": "^2.2.10"
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/node": "^25.9.3",
+    "@types/papaparse": "^5.5.2",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "tailwindcss": "^4.3.0",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8",
+    "vue-tsc": "^3.3.4"
   }
 }

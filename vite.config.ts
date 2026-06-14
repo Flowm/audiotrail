@@ -49,8 +49,11 @@ export default defineConfig({
     chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
-        manualChunks: {
-          echarts: ['echarts', 'vue-echarts'],
+        // Vite 8 runs on Rolldown, where the object form of manualChunks is
+        // gone; codeSplitting.groups is its replacement. captured modules pull
+        // in their deps by default, so echarts' zrender lands here too.
+        codeSplitting: {
+          groups: [{ name: 'echarts', test: /[\\/]node_modules[\\/](echarts|vue-echarts)[\\/]/ }],
         },
       },
     },
