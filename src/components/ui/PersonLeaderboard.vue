@@ -7,7 +7,7 @@ import { formatDuration, formatNumber } from "@/lib/format";
 const props = withDefaults(defineProps<{ people: PersonStats[]; metric: "hours" | "books"; limit?: number }>(), { limit: 10 });
 
 const rows = computed(() => {
-  const sorted = [...props.people].sort((a, b) => (props.metric === "hours" ? b.totalMs - a.totalMs : b.bookCount - a.bookCount));
+  const sorted = props.people.toSorted((a, b) => (props.metric === "hours" ? b.totalMs - a.totalMs : b.bookCount - a.bookCount));
   const top = sorted.slice(0, props.limit);
   const max = props.metric === "hours" ? Math.max(1, ...top.map((person) => person.totalMs)) : Math.max(1, ...top.map((person) => person.bookCount));
   return top.map((person) => ({

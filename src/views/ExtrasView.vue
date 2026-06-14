@@ -45,7 +45,7 @@ const survivors = computed(() => wishlist.value.filter((w) => w.status === "Wish
 const DAY_MS = 86_400_000;
 const survivorAges = computed(() => {
   const now = Date.now();
-  return survivors.value.map((w) => Math.floor((now - Date.parse(`${w.addDate}T00:00:00Z`)) / DAY_MS)).sort((a, b) => a - b);
+  return survivors.value.map((w) => Math.floor((now - Date.parse(`${w.addDate}T00:00:00Z`)) / DAY_MS)).toSorted((a, b) => a - b);
 });
 const medianWishAge = computed(() => {
   const ages = survivorAges.value;
@@ -78,7 +78,7 @@ const topKeywords = computed(() => {
   }
   return [...byKeyword.entries()]
     .map(([keyword, entry]) => ({ keyword, ...entry }))
-    .sort((a, b) => b.searches - a.searches)
+    .toSorted((a, b) => b.searches - a.searches)
     .slice(0, 12);
 });
 
@@ -92,7 +92,7 @@ const outputShare = computed(() => {
     if (event.audioOutput === null) continue;
     byOutput.set(event.audioOutput, (byOutput.get(event.audioOutput) ?? 0) + 1);
   }
-  return [...byOutput.entries()].sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
+  return [...byOutput.entries()].toSorted((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
 });
 
 const playbackRange = computed(() => {

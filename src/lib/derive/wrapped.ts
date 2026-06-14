@@ -93,7 +93,7 @@ export function wrappedStats(year: number, sessions: ListeningSession[], books: 
 
   const almostFinished = books
     .filter((book) => book.completion !== null && book.completion >= 0.85 && book.completion < 0.99 && !book.finished && book.lastListen?.startsWith(prefix))
-    .sort((a, b) => b.completion! - a.completion!)
+    .toSorted((a, b) => b.completion! - a.completion!)
     .slice(0, 3)
     .map((book) => ({ title: book.title, completion: book.completion! }));
 

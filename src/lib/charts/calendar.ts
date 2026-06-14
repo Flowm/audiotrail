@@ -12,7 +12,7 @@ export function calendarHeatmapOption(days: DayTotal[], year: number, p: ChartPa
   const data = inYear.map((day) => [day.date, Math.round(day.ms / 60_000)]);
 
   // Cap the scale at ~p95 so a single marathon day doesn't wash out the rest.
-  const sorted = inYear.map((day) => day.ms / 60_000).sort((a, b) => a - b);
+  const sorted = inYear.map((day) => day.ms / 60_000).toSorted((a, b) => a - b);
   const p95 = sorted[Math.floor(sorted.length * 0.95)] ?? 0;
   const cap = Math.max(30, Math.ceil(p95 / 30) * 30);
 

@@ -44,7 +44,7 @@ function shareByMs(pick: (session: (typeof sessions.value)[number]) => string | 
     if (key === null) continue;
     byKey.set(key, (byKey.get(key) ?? 0) + session.durationMs);
   }
-  return [...byKey.entries()].sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name: rename ? rename(name) : name, value }));
+  return [...byKey.entries()].toSorted((a, b) => b[1] - a[1]).map(([name, value]) => ({ name: rename ? rename(name) : name, value }));
 }
 
 const deliveryShare = computed(() => shareByMs((s) => s.deliveryType));
@@ -84,7 +84,7 @@ const appVersions = computed<AppVersionRow[]>(() => {
   }
   return [...byVersion.entries()]
     .map(([version, entry]) => ({ version, ...entry }))
-    .sort((a, b) => (a.first < b.first ? 1 : -1))
+    .toSorted((a, b) => (a.first < b.first ? 1 : -1))
     .slice(0, 10);
 });
 

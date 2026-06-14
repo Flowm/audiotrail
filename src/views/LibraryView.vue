@@ -67,7 +67,7 @@ const filtered = computed(() => {
         return book.completion ?? -1;
     }
   };
-  return [...rows].sort((a, b) => {
+  return rows.toSorted((a, b) => {
     const av = value(a);
     const bv = value(b);
     return (av < bv ? -1 : av > bv ? 1 : 0) * direction;
@@ -91,7 +91,7 @@ function composition(pick: (book: BookStats) => string | null): DonutSlice[] {
     if (key === null) continue;
     byKey.set(key, (byKey.get(key) ?? 0) + 1);
   }
-  return [...byKey.entries()].sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
+  return [...byKey.entries()].toSorted((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
 }
 
 const languageShare = computed(() => composition((b) => b.library?.language ?? "unknown"));

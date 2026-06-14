@@ -98,7 +98,7 @@ export const listeningDataset: DatasetDescriptor = {
     }
 
     sessions.sort((a, b) => (a.startDate < b.startDate ? -1 : a.startDate > b.startDate ? 1 : 0));
-    const profiles = [...rowsPerProfile.entries()].sort((a, b) => b[1] - a[1]).map(([profile]) => profile);
+    const profiles = [...rowsPerProfile.entries()].toSorted((a, b) => b[1] - a[1]).map(([profile]) => profile);
 
     const detailParts = [`${profiles.length} profile${profiles.length === 1 ? "" : "s"}`];
     if (duplicates > 0) detailParts.push(`${duplicates} multipart echo rows dropped`);

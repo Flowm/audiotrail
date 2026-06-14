@@ -88,7 +88,7 @@ export async function ingestTakeout(provider: FileProvider, onProgress?: (progre
     ignoredPaths: files
       .map((file) => file.path)
       .filter((path) => !recognized.has(path))
-      .sort(),
+      .toSorted(),
     datasets: statuses,
   };
 

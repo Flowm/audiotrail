@@ -33,7 +33,7 @@ const LAG_BUCKETS: { label: string; maxDays: number }[] = [
 export function backlogStats(books: BookStats[]): BacklogStats {
   const neverListened = books
     .filter((book) => book.totalMs === 0 && book.library !== null && book.library.ownership !== "Revoked")
-    .sort((a, b) => (b.library?.purchaseDate ?? 0) - (a.library?.purchaseDate ?? 0));
+    .toSorted((a, b) => (b.library?.purchaseDate ?? 0) - (a.library?.purchaseDate ?? 0));
 
   const backlogMs = neverListened.reduce((sum, book) => sum + (book.bookLengthMs ?? 0), 0);
 
@@ -99,7 +99,7 @@ export function acquisitionsByMonth(library: LibraryItem[], purchases: Purchase[
     else entry.other += 1;
   }
 
-  const months = [...byMonth.keys()].sort();
+  const months = [...byMonth.keys()].toSorted();
   if (months.length === 0) return [];
   return monthSpan(months[0]!, months[months.length - 1]!).map((month) => byMonth.get(month) ?? { month, credit: 0, cash: 0, other: 0 });
 }

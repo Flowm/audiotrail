@@ -24,7 +24,7 @@ function accumulate(books: BookStats[], pick: (book: BookStats) => string[]): Pe
       if (book.finished) entry.finishedCount += 1;
     }
   }
-  return [...byName.values()].sort((a, b) => b.totalMs - a.totalMs);
+  return [...byName.values()].toSorted((a, b) => b.totalMs - a.totalMs);
 }
 
 export function authorStats(books: BookStats[]): PersonStats[] {
@@ -61,7 +61,7 @@ export function seriesStats(books: BookStats[]): SeriesStats[] {
       entry.totalMs += book.totalMs;
     }
   }
-  return [...byKey.values()].sort((a, b) => b.totalMs - a.totalMs);
+  return [...byKey.values()].toSorted((a, b) => b.totalMs - a.totalMs);
 }
 
 export interface MonthlyAuthorHours {
@@ -94,10 +94,10 @@ export function monthlyAuthorHours(sessions: ListeningSession[], books: BookStat
   }
 
   if (perMonth.size === 0) return { months: [], series: [] };
-  const monthKeys = [...perMonth.keys()].sort();
+  const monthKeys = [...perMonth.keys()].toSorted();
   const months = monthSpan(monthKeys[0]!, monthKeys[monthKeys.length - 1]!);
   const top = [...totals.entries()]
-    .sort((a, b) => b[1] - a[1])
+    .toSorted((a, b) => b[1] - a[1])
     .slice(0, topN)
     .map(([name]) => name);
 
@@ -176,10 +176,10 @@ export function monthlySeriesHours(sessions: ListeningSession[], books: BookStat
 
   if (perMonth.size === 0) return { months: [], groups: [], other: [] };
 
-  const monthKeys = [...perMonth.keys()].sort();
+  const monthKeys = [...perMonth.keys()].toSorted();
   const months = monthSpan(monthKeys[0]!, monthKeys[monthKeys.length - 1]!);
   const topKeys = [...totals.entries()]
-    .sort((a, b) => b[1] - a[1])
+    .toSorted((a, b) => b[1] - a[1])
     .slice(0, topN)
     .map(([key]) => key);
   const topSet = new Set(topKeys);
@@ -228,7 +228,7 @@ export function authorNarratorSankey(books: BookStats[], maxAuthors = 10): Sanke
 
   const topAuthors = new Set(
     [...authorTotals.entries()]
-      .sort((a, b) => b[1] - a[1])
+      .toSorted((a, b) => b[1] - a[1])
       .slice(0, maxAuthors)
       .map(([name]) => name),
   );

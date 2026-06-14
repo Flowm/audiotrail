@@ -34,7 +34,7 @@ export function dailyTotals(sessions: ListeningSession[]): DayTotal[] {
       byDay.set(session.startDate, { date: session.startDate, ms: session.durationMs, sessions: 1 });
     }
   }
-  return [...byDay.values()].sort((a, b) => (a.date < b.date ? -1 : 1));
+  return [...byDay.values()].toSorted((a, b) => (a.date < b.date ? -1 : 1));
 }
 
 /** Continuous day series from first to last date (zero-filled gaps). */
@@ -59,7 +59,7 @@ export function weeklyTotals(days: DayTotal[]): { weekStart: IsoDate; ms: number
     const monday = dayToIso(epoch - ((epoch + 3) % 7));
     byWeek.set(monday, (byWeek.get(monday) ?? 0) + day.ms);
   }
-  return [...byWeek.entries()].map(([weekStart, ms]) => ({ weekStart, ms })).sort((a, b) => (a.weekStart < b.weekStart ? -1 : 1));
+  return [...byWeek.entries()].map(([weekStart, ms]) => ({ weekStart, ms })).toSorted((a, b) => (a.weekStart < b.weekStart ? -1 : 1));
 }
 
 /** Every 'YYYY-MM' from first to last, inclusive — for gapless month axes. */
@@ -84,7 +84,7 @@ export function monthlyTotals(days: DayTotal[]): { month: string; ms: number }[]
     const month = day.date.slice(0, 7);
     byMonth.set(month, (byMonth.get(month) ?? 0) + day.ms);
   }
-  return [...byMonth.entries()].map(([month, ms]) => ({ month, ms })).sort((a, b) => (a.month < b.month ? -1 : 1));
+  return [...byMonth.entries()].map(([month, ms]) => ({ month, ms })).toSorted((a, b) => (a.month < b.month ? -1 : 1));
 }
 
 export function yearlyTotals(days: DayTotal[]): { year: number; ms: number }[] {
@@ -93,7 +93,7 @@ export function yearlyTotals(days: DayTotal[]): { year: number; ms: number }[] {
     const year = Number(day.date.slice(0, 4));
     byYear.set(year, (byYear.get(year) ?? 0) + day.ms);
   }
-  return [...byYear.entries()].map(([year, ms]) => ({ year, ms })).sort((a, b) => a.year - b.year);
+  return [...byYear.entries()].map(([year, ms]) => ({ year, ms })).toSorted((a, b) => a.year - b.year);
 }
 
 export interface StreakInfo {
@@ -217,13 +217,13 @@ export function biggestDays(sessions: ListeningSession[], n: number): BigDay[] {
     entry.products.set(session.productName, (entry.products.get(session.productName) ?? 0) + session.durationMs);
   }
   return [...byDay.entries()]
-    .sort((a, b) => b[1].ms - a[1].ms)
+    .toSorted((a, b) => b[1].ms - a[1].ms)
     .slice(0, n)
     .map(([date, { ms, products }]) => ({
       date,
       ms,
       topProducts: [...products.entries()]
-        .sort((a, b) => b[1] - a[1])
+        .toSorted((a, b) => b[1] - a[1])
         .slice(0, 2)
         .map(([name]) => name),
     }));

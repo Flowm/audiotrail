@@ -8,7 +8,7 @@ import type { ChartPalette } from "./types";
 
 /** Horizontal top-N books by listening time, completion in the bar label. */
 export function topBooksOption(books: BookStats[], n: number, p: ChartPalette): EChartsOption {
-  const top = books.slice(0, n).reverse();
+  const top = books.slice(0, n).toReversed();
   const hours = top.map((book) => Math.round((book.totalMs / 3_600_000) * 10) / 10);
 
   return {

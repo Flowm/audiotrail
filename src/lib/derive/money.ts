@@ -31,7 +31,7 @@ export function monthlySpend(billings: BillingEvent[], purchases: Purchase[]): M
     if (purchase.type !== "CASH") continue;
     bucket(purchase.orderPlaceDate.slice(0, 7)).cash += purchase.pricePaid ?? 0;
   }
-  const months = [...byMonth.keys()].sort();
+  const months = [...byMonth.keys()].toSorted();
   if (months.length === 0) return [];
   return monthSpan(months[0]!, months[months.length - 1]!).map((month) => {
     const entry = byMonth.get(month) ?? { month, membership: 0, cash: 0 };
@@ -61,7 +61,7 @@ export function creditFlow(credits: Credit[]): CreditFlow {
     else active += 1;
   }
   return {
-    earnedByReason: [...byReason.entries()].map(([reason, count]) => ({ reason, count })).sort((a, b) => b.count - a.count),
+    earnedByReason: [...byReason.entries()].map(([reason, count]) => ({ reason, count })).toSorted((a, b) => b.count - a.count),
     total: credits.length,
     consumed,
     expired,
@@ -121,7 +121,7 @@ export function costPerYear(billings: BillingEvent[], purchases: Purchase[], day
     finishedByYear.set(year, (finishedByYear.get(year) ?? 0) + 1);
   }
 
-  const years = [...new Set([...spendByYear.keys(), ...hoursByYear.keys()])].sort();
+  const years = [...new Set([...spendByYear.keys(), ...hoursByYear.keys()])].toSorted();
   return years.map((year) => {
     const spend = round2(spendByYear.get(year) ?? 0);
     const hours = hoursByYear.get(year) ?? 0;
@@ -180,7 +180,7 @@ export function expiringCredits(credits: Credit[], now: number, withinDays = 90)
       const daysLeft = (expires - now) / DAY_MS;
       return daysLeft >= 0 && daysLeft <= withinDays;
     })
-    .sort((a, b) => (a.expireDate! < b.expireDate! ? -1 : 1));
+    .toSorted((a, b) => (a.expireDate! < b.expireDate! ? -1 : 1));
 }
 
 export function unusedActiveCredits(credits: Credit[]): number {

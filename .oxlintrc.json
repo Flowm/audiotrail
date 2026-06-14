@@ -8,8 +8,10 @@
   },
   "rules": {
     "consistent-function-scoping": "off",
-    "import/no-unassigned-import": ["warn", { "allow": ["**/*.css"] }],
-    "no-console": "off"
+    "import/no-unassigned-import": ["warn", { "allow": ["**/*.css", "**/echarts"] }],
+    "no-console": "off",
+    "no-await-in-loop": "off",
+    "no-map-spread": "off"
   },
   "env": {
     "builtin": true,
