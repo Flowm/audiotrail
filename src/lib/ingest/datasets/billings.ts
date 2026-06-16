@@ -8,7 +8,7 @@ import type { DatasetDescriptor } from "./descriptor";
 export const billingsDataset: DatasetDescriptor = {
   key: "billings",
   label: "Membership billings",
-  match: /Audible\.MembershipBillings\/[^/]*\.csv$/i,
+  match: /Audible\.MembershipBillings\/[^/]*\.csv$|Account & Membership\/Membership Billing\.csv$/i,
 
   async parse(files) {
     const warnings: string[] = [];
@@ -35,7 +35,7 @@ export const billingsDataset: DatasetDescriptor = {
           currency: sentinel(row.Currency),
           type: sentinel(row.Type),
           plan: sentinel(row.Plan),
-          billingFreqMonths: int(row["Plan Billing Freq"]),
+          billingFreqMonths: int(row["Plan Billing Freq"] ?? row["Plan Billing Frequency"]),
           planFee: num(row["Plan Billing Fee"]),
           offerName: sentinel(row["Offer Name"]),
           offerType: sentinel(row["Offer Type"]),

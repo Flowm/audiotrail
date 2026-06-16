@@ -21,7 +21,8 @@ export const playbackDataset: DatasetDescriptor = {
       warnings.push(...csvWarnings.map((warning) => `${file.path}: ${warning}`));
       for (const raw of rows) {
         const row = raw as RawPlaybackRow;
-        const time = epochMs(row.Time);
+        // 'Time' in older exports; renamed to 'Creation Date' in the 2026 export.
+        const time = epochMs(row.Time ?? row["Creation Date"]);
         if (time === null) {
           skipped += 1;
           continue;

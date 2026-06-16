@@ -34,7 +34,9 @@ function identityKey(profile: string, session: Omit<ListeningSession, "profile">
 export const listeningDataset: DatasetDescriptor = {
   key: "listening",
   label: "Listening history",
-  match: /Audible\.Listening\/[^/]+\/[^/]*\.csv$/i,
+  // Old: one Listening.csv per profile folder. New (2026): a single
+  // consolidated 'Listening History.csv' with no per-profile split.
+  match: /Audible\.Listening\/[^/]+\/[^/]*\.csv$|Library & Listening\/Listening History\.csv$/i,
 
   async parse(files) {
     const sessions: ListeningSession[] = [];

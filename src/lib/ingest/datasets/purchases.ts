@@ -8,7 +8,7 @@ import type { DatasetDescriptor } from "./descriptor";
 export const purchasesDataset: DatasetDescriptor = {
   key: "purchases",
   label: "Purchases",
-  match: /Audible\.PurchaseHistory\/[^/]*\.csv$/i,
+  match: /Audible\.PurchaseHistory\/[^/]*\.csv$|Account & Membership\/Purchase History\.csv$/i,
 
   async parse(files) {
     const warnings: string[] = [];

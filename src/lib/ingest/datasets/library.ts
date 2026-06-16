@@ -2,7 +2,7 @@ import type { LibraryItem, SeriesRef } from "@/types/models";
 import type { RawLibraryRow } from "@/types/raw";
 
 import { parseCsv } from "../csv";
-import { epochMs, int, sentinel, splitList, yesNo } from "../normalize";
+import { epochMs, int, sentinel, splitList, titleToSnake, yesNo } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 const SERIES_RE = /^asin:([^,]*),\s*title:(.*)$/;
@@ -102,13 +102,15 @@ export function mergeLibraryRows(rows: RawLibraryRow[]): {
 export const libraryDataset: DatasetDescriptor = {
   key: "library",
   label: "Library",
-  match: /AudibleLibraryItemFactoryService\/datasets\/Library[^/]*\/[^/]*\.csv$/i,
+  // Old: per-marketplace files under AudibleLibraryItemFactoryService. New
+  // (2026): a single 'Library.csv' with Title Case headers (titleToSnake bridges them).
+  match: /AudibleLibraryItemFactoryService\/datasets\/Library[^/]*\/[^/]*\.csv$|Library & Listening\/Library\.csv$/i,
 
   async parse(files) {
     const warnings: string[] = [];
     const allRows: RawLibraryRow[] = [];
     for (const file of files) {
-      const { rows, warnings: csvWarnings } = parseCsv(await file.text());
+      const { rows, warnings: csvWarnings } = parseCsv(await file.text(), titleToSnake);
       warnings.push(...csvWarnings.map((warning) => `${file.path}: ${warning}`));
       allRows.push(...(rows as RawLibraryRow[]));
     }

@@ -13,13 +13,19 @@ const MAX_REPORTED_ERRORS = 5;
  * and skips blank lines. Field-count mismatches (older exports occasionally
  * leave a comma unquoted) are folded into one calm note instead of being
  * reported per row.
+ *
+ * `normalizeHeader` runs after the trim \u2014 Library and Collections pass
+ * `titleToSnake` so their snake_case parsers read the newer Title Case exports.
  */
-export function parseCsv(text: string): CsvResult {
+export function parseCsv(text: string, normalizeHeader?: (header: string) => string): CsvResult {
   const clean = text.replace(/^\uFEFF/, "");
   const result = Papa.parse<Record<string, string>>(clean, {
     header: true,
     skipEmptyLines: "greedy",
-    transformHeader: (header) => header.trim(),
+    transformHeader: (header) => {
+      const trimmed = header.trim();
+      return normalizeHeader ? normalizeHeader(trimmed) : trimmed;
+    },
   });
 
   // A FieldMismatch means a row parsed with more/fewer fields than the header —

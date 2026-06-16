@@ -92,6 +92,8 @@ export interface RawBillingRow {
   Type?: string;
   Plan?: string;
   "Plan Billing Freq"?: string;
+  /** Renamed from 'Plan Billing Freq' in the 2026 export. */
+  "Plan Billing Frequency"?: string;
   "Plan Billing Fee"?: string;
   "Offer Name"?: string;
   "Offer Type"?: string;
@@ -114,6 +116,8 @@ export interface RawCollectionRow {
   collection_type?: string;
   collection_creation_date?: string;
   last_modified_date?: string;
+  /** Renamed from 'last_modified_date' in the 2026 export. */
+  last_modified_timestamp?: string;
   is_public_collection?: string;
   is_collection_archived?: string;
   total_items_in_collection?: string;
@@ -174,6 +178,8 @@ export interface RawSearchHitRow {
 
 export interface RawPlaybackRow {
   Time?: string;
+  /** Replaces 'Time' as the per-event timestamp in the 2026 export. */
+  "Creation Date"?: string;
   Sequence?: string;
   "Activity Type"?: string;
   "Audio Output Method"?: string;

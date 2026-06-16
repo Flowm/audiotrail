@@ -69,3 +69,14 @@ export function orderId(value: string | undefined | null): string | null {
   const raw = sentinel(value);
   return raw === "-1" ? null : raw;
 }
+
+/**
+ * Maps a 2026-era 'Title Case' CSV header onto the snake_case key the Library
+ * and Collections parsers expect ('Book Series Info' → 'book_series_info').
+ * 'ASIN' is preserved verbatim, and already-snake_case headers from older
+ * exports pass through unchanged, so the same parser reads either layout.
+ */
+export function titleToSnake(header: string): string {
+  if (header === "ASIN") return "ASIN";
+  return header.toLowerCase().replace(/ /g, "_");
+}
