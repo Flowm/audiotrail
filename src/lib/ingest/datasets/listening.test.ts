@@ -29,9 +29,11 @@ const KID_CSV =
 
 describe("listeningDataset", () => {
   it("matches per-profile listening files, with or without a wrapper dir", () => {
-    expect(listeningDataset.match.test("Audible.Listening/Account Holder/Listening.csv")).toBe(true);
-    expect(listeningDataset.match.test("Takeout/Audible.Listening/Kids Profile 1/Listening.csv")).toBe(true);
-    expect(listeningDataset.match.test("Audible.PurchaseHistory/Audible.PurchaseHistory.csv")).toBe(false);
+    const matches = (path: string): boolean => listeningDataset.match.some((pattern) => pattern.test(path));
+    expect(matches("Audible.Listening/Account Holder/Listening.csv")).toBe(true);
+    expect(matches("Takeout/Audible.Listening/Kids Profile 1/Listening.csv")).toBe(true);
+    expect(matches("Your Audible Library & Listening/Listening History.csv")).toBe(true);
+    expect(matches("Audible.PurchaseHistory/Audible.PurchaseHistory.csv")).toBe(false);
   });
 
   it("parses sessions, extracts profiles and skips incomplete rows", async () => {

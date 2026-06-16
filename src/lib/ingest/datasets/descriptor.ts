@@ -14,9 +14,10 @@ export interface DatasetDescriptor {
   key: DatasetKey;
   label: string;
   /**
-   * Tested against the full path of every file in the takeout. Anchored on
-   * the path suffix so an optional wrapper directory never breaks discovery.
+   * Path shapes that identify this dataset — a file matches if it matches any
+   * of them. Anchored on the path suffix so an optional wrapper directory never
+   * breaks discovery; one entry per export layout the dataset is known to ship in.
    */
-  match: RegExp;
+  match: RegExp[];
   parse(files: VirtualFile[]): Promise<DatasetParseResult>;
 }

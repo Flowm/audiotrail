@@ -92,10 +92,12 @@ describe("mergeLibraryRows", () => {
 });
 
 describe("libraryDataset", () => {
-  it("matches the three marketplace variants", () => {
+  it("matches the marketplace variants and the 2026 single file", () => {
+    const matches = (path: string): boolean => libraryDataset.match.some((pattern) => pattern.test(path));
     for (const name of ["Library", "Library_DUB", "Library_ZAZ"]) {
-      expect(libraryDataset.match.test(`Audible.AudibleLibraryItemFactoryService/datasets/${name}/${name}.csv`)).toBe(true);
+      expect(matches(`Audible.AudibleLibraryItemFactoryService/datasets/${name}/${name}.csv`)).toBe(true);
     }
+    expect(matches("Your Audible Library & Listening/Library.csv")).toBe(true);
   });
 
   it("parses CSV files and reports merge detail", async () => {
@@ -108,5 +110,16 @@ describe("libraryDataset", () => {
     expect(result.rows).toBe(1);
     expect(result.detail).toContain("2 rows across 2 file(s)");
     expect(result.patch.library![0]!.marketplaces).toHaveLength(2);
+  });
+
+  it("reads 2026 Title Case headers via the titleToSnake bridge", async () => {
+    const csv = '﻿ASIN,Title,Authors,Marketplace,Length in Minutes,Is Finished\nB0AAA,Alpha,"Ann Author",www.audible.de,826,Yes\n';
+    const result = await libraryDataset.parse([vf("Your Audible Library & Listening/Library.csv", csv)]);
+    expect(result.rows).toBe(1);
+    const item = result.patch.library![0]!;
+    expect(item.title).toBe("Alpha");
+    expect(item.authors).toEqual(["Ann Author"]);
+    expect(item.lengthMinutes).toBe(826);
+    expect(item.isFinished).toBe(true);
   });
 });

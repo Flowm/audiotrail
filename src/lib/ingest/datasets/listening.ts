@@ -36,7 +36,7 @@ export const listeningDataset: DatasetDescriptor = {
   label: "Listening history",
   // Old: one Listening.csv per profile folder. New (2026): a single
   // consolidated 'Listening History.csv' with no per-profile split.
-  match: /Audible\.Listening\/[^/]+\/[^/]*\.csv$|Library & Listening\/Listening History\.csv$/i,
+  match: [/Audible\.Listening\/[^/]+\/[^/]*\.csv$/i, /Library & Listening\/Listening History\.csv$/i],
 
   async parse(files) {
     const sessions: ListeningSession[] = [];

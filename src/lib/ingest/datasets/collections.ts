@@ -2,10 +2,14 @@ import type { CollectionInfo, CollectionItem } from "@/types/models";
 import type { RawCollectionRow } from "@/types/raw";
 
 import { parseCsv } from "../csv";
-import { epochMs, int, sentinel, titleToSnake, yesNo } from "../normalize";
+import { epochMs, headerAlias, int, sentinel, titleToSnake, yesNo } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 const SYSTEM_IDS = new Set(["PENDING", "PURCHASE", "WISHLIST", "ARCHIVE", "AYCL"]);
+
+// Title Case → snake_case, then fold the 2026 'last_modified_timestamp' rename
+// onto the older 'last_modified_date' so the parser reads one key.
+const normalizeHeader = headerAlias({ last_modified_timestamp: "last_modified_date" }, titleToSnake);
 
 /**
  * Two row kinds: collection headers (ASIN empty, carries totals) and item
@@ -16,7 +20,7 @@ const SYSTEM_IDS = new Set(["PENDING", "PURCHASE", "WISHLIST", "ARCHIVE", "AYCL"
 export const collectionsDataset: DatasetDescriptor = {
   key: "collections",
   label: "Collections",
-  match: /AudibleGlobalLibraryService\/datasets\/Collections[^/]*\/[^/]*\.csv$|Library & Listening\/Collections\.csv$/i,
+  match: [/AudibleGlobalLibraryService\/datasets\/Collections[^/]*\/[^/]*\.csv$/i, /Library & Listening\/Collections\.csv$/i],
 
   async parse(files) {
     const warnings: string[] = [];
@@ -26,7 +30,7 @@ export const collectionsDataset: DatasetDescriptor = {
     let rawRows = 0;
 
     for (const file of files) {
-      const { rows, warnings: csvWarnings } = parseCsv(await file.text(), titleToSnake);
+      const { rows, warnings: csvWarnings } = parseCsv(await file.text(), normalizeHeader);
       warnings.push(...csvWarnings.map((warning) => `${file.path}: ${warning}`));
       for (const raw of rows) {
         rawRows += 1;
@@ -48,7 +52,7 @@ export const collectionsDataset: DatasetDescriptor = {
             type,
             isSystem: type === "PermanentCollection" || SYSTEM_IDS.has(id),
             createdAt: epochMs(row.collection_creation_date),
-            lastModified: epochMs(row.last_modified_date ?? row.last_modified_timestamp),
+            lastModified: epochMs(row.last_modified_date),
             isPublic: yesNo(row.is_public_collection),
             isArchived: yesNo(row.is_collection_archived),
             totalItems: int(row.total_items_in_collection),

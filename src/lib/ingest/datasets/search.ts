@@ -8,7 +8,7 @@ import type { DatasetDescriptor } from "./descriptor";
 export const searchSessionsDataset: DatasetDescriptor = {
   key: "searchSessions",
   label: "Search sessions",
-  match: /SearchData_Tommy_Group\/[^/]*\.csv$/i,
+  match: [/SearchData_Tommy_Group\/[^/]*\.csv$/i],
 
   async parse(files) {
     const warnings: string[] = [];
@@ -55,7 +55,7 @@ export const searchSessionsDataset: DatasetDescriptor = {
 export const searchHitsDataset: DatasetDescriptor = {
   key: "searchHits",
   label: "Search results",
-  match: /SearchData_Tommy_ASIN\/[^/]*\.csv$/i,
+  match: [/SearchData_Tommy_ASIN\/[^/]*\.csv$/i],
 
   async parse(files) {
     const warnings: string[] = [];

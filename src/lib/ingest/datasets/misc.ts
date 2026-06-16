@@ -19,7 +19,7 @@ async function collectRows(files: VirtualFile[], warnings: string[]): Promise<Re
 export const cartDataset: DatasetDescriptor = {
   key: "cart",
   label: "Cart history",
-  match: /Audible\.CartHistory\/[^/]*\.csv$|Account & Membership\/Cart History\.csv$/i,
+  match: [/Audible\.CartHistory\/[^/]*\.csv$/i, /Account & Membership\/Cart History\.csv$/i],
 
   async parse(files): Promise<DatasetParseResult> {
     const warnings: string[] = [];
@@ -38,7 +38,7 @@ export const cartDataset: DatasetDescriptor = {
 export const returnsDataset: DatasetDescriptor = {
   key: "returns",
   label: "Returns",
-  match: /Audible\.ContentReturn\/[^/]*\.csv$|Account & Membership\/Content Returns\.csv$/i,
+  match: [/Audible\.ContentReturn\/[^/]*\.csv$/i, /Account & Membership\/Content Returns\.csv$/i],
 
   async parse(files): Promise<DatasetParseResult> {
     const warnings: string[] = [];
@@ -62,7 +62,7 @@ export const returnsDataset: DatasetDescriptor = {
 export const devicesDataset: DatasetDescriptor = {
   key: "devices",
   label: "Device activations",
-  match: /Audible\.DeviceActivation\/.*\.csv$|Account & Membership\/Device Activations\.csv$/i,
+  match: [/Audible\.DeviceActivation\/.*\.csv$/i, /Account & Membership\/Device Activations\.csv$/i],
 
   async parse(files): Promise<DatasetParseResult> {
     const warnings: string[] = [];
@@ -84,7 +84,7 @@ export const devicesDataset: DatasetDescriptor = {
 export const impressionsDataset: DatasetDescriptor = {
   key: "impressions",
   label: "Adobe impressions",
-  match: /Audible\.AdobeImpressions\/[^/]*\.csv$|Preferences & Settings\/Impressions Data\.csv$/i,
+  match: [/Audible\.AdobeImpressions\/[^/]*\.csv$/i, /Preferences & Settings\/Impressions Data\.csv$/i],
 
   async parse(files): Promise<DatasetParseResult> {
     const warnings: string[] = [];
@@ -105,7 +105,7 @@ export const impressionsDataset: DatasetDescriptor = {
 export const membershipEventsDataset: DatasetDescriptor = {
   key: "membershipEvents",
   label: "Membership events",
-  match: /Audible\.MembershipEvent\/[^/]*\.csv$|Account & Membership\/Membership History\.csv$/i,
+  match: [/Audible\.MembershipEvent\/[^/]*\.csv$/i, /Account & Membership\/Membership History\.csv$/i],
 
   async parse(files): Promise<DatasetParseResult> {
     const warnings: string[] = [];

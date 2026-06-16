@@ -58,8 +58,11 @@ export const accountDataset: DatasetDescriptor = {
   label: "Account attributes",
   // Old: JSON singletons. New (2026): CSV files under Account & Membership /
   // Preferences & Settings, each carrying a 'Marketplace' column.
-  match:
-    /(AccountDetails|AccountCustomerAttribute|CustomerOnboardingAttributes|CustomerSegment)\.json$|Account & Membership\/Account Details\.csv$|Preferences & Settings\/(Customer Segment|Onboarding Preferences)\.csv$/i,
+  match: [
+    /(AccountDetails|AccountCustomerAttribute|CustomerOnboardingAttributes|CustomerSegment)\.json$/i,
+    /Account & Membership\/Account Details\.csv$/i,
+    /Preferences & Settings\/(Customer Segment|Onboarding Preferences)\.csv$/i,
+  ],
 
   async parse(files) {
     const warnings: string[] = [];

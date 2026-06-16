@@ -2,13 +2,16 @@ import type { BillingEvent } from "@/types/models";
 import type { RawBillingRow } from "@/types/raw";
 
 import { parseCsv } from "../csv";
-import { int, isoDate, num, sentinel } from "../normalize";
+import { headerAlias, int, isoDate, num, sentinel } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
+
+// 'Plan Billing Freq' in older exports; renamed to 'Plan Billing Frequency' in 2026.
+const normalizeHeader = headerAlias({ "Plan Billing Frequency": "Plan Billing Freq" });
 
 export const billingsDataset: DatasetDescriptor = {
   key: "billings",
   label: "Membership billings",
-  match: /Audible\.MembershipBillings\/[^/]*\.csv$|Account & Membership\/Membership Billing\.csv$/i,
+  match: [/Audible\.MembershipBillings\/[^/]*\.csv$/i, /Account & Membership\/Membership Billing\.csv$/i],
 
   async parse(files) {
     const warnings: string[] = [];
@@ -16,7 +19,7 @@ export const billingsDataset: DatasetDescriptor = {
     let skipped = 0;
 
     for (const file of files) {
-      const { rows, warnings: csvWarnings } = parseCsv(await file.text());
+      const { rows, warnings: csvWarnings } = parseCsv(await file.text(), normalizeHeader);
       warnings.push(...csvWarnings.map((warning) => `${file.path}: ${warning}`));
       for (const raw of rows) {
         const row = raw as RawBillingRow;
@@ -35,7 +38,7 @@ export const billingsDataset: DatasetDescriptor = {
           currency: sentinel(row.Currency),
           type: sentinel(row.Type),
           plan: sentinel(row.Plan),
-          billingFreqMonths: int(row["Plan Billing Freq"] ?? row["Plan Billing Frequency"]),
+          billingFreqMonths: int(row["Plan Billing Freq"]),
           planFee: num(row["Plan Billing Fee"]),
           offerName: sentinel(row["Offer Name"]),
           offerType: sentinel(row["Offer Type"]),

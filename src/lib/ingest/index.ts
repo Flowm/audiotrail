@@ -33,7 +33,7 @@ export async function ingestTakeout(provider: FileProvider, onProgress?: (progre
     });
     await breathe();
 
-    const matched = files.filter((file) => dataset.match.test(file.path));
+    const matched = files.filter((file) => dataset.match.some((pattern) => pattern.test(file.path)));
     if (matched.length === 0) {
       statuses.push({
         key: dataset.key,

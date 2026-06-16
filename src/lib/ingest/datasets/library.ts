@@ -104,7 +104,7 @@ export const libraryDataset: DatasetDescriptor = {
   label: "Library",
   // Old: per-marketplace files under AudibleLibraryItemFactoryService. New
   // (2026): a single 'Library.csv' with Title Case headers (titleToSnake bridges them).
-  match: /AudibleLibraryItemFactoryService\/datasets\/Library[^/]*\/[^/]*\.csv$|Library & Listening\/Library\.csv$/i,
+  match: [/AudibleLibraryItemFactoryService\/datasets\/Library[^/]*\/[^/]*\.csv$/i, /Library & Listening\/Library\.csv$/i],
 
   async parse(files) {
     const warnings: string[] = [];

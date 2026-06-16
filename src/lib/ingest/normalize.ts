@@ -80,3 +80,16 @@ export function titleToSnake(header: string): string {
   if (header === "ASIN") return "ASIN";
   return header.toLowerCase().replace(/ /g, "_");
 }
+
+/**
+ * Builds a CSV header normalizer for `parseCsv`: applies `base` (identity by
+ * default), then folds any aliased spelling onto its canonical key. Lets a
+ * parser read one column name regardless of which export vintage renamed it —
+ * e.g. `headerAlias({ "Creation Date": "Time" })` so both map to `Time`.
+ */
+export function headerAlias(aliases: Record<string, string>, base: (header: string) => string = (header) => header): (header: string) => string {
+  return (header) => {
+    const normalized = base(header);
+    return aliases[normalized] ?? normalized;
+  };
+}
