@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import JSZip from "jszip";
+import { strFromU8, unzipSync } from "fflate";
 import Papa from "papaparse";
 import { describe, expect, it } from "vitest";
 
@@ -50,13 +50,13 @@ describe.skipIf(samples.length === 0)("real takeout smoke (local samples only)",
   it.each(samples)("%s parses consistently with an independent pass", async (name) => {
     const data = new Uint8Array(readFileSync(join(dataDir, name)));
     const { bundle, report } = await ingestTakeout(await zipProvider(data));
-    const zip = await JSZip.loadAsync(data);
+    const entries = unzipSync(data);
 
     const statusOf = (key: string) => report.datasets.find((dataset) => dataset.key === key)!;
     const readRows = async (paths: string[], normalizeHeader?: (header: string) => string): Promise<Record<string, string>[]> => {
       const out: Record<string, string>[] = [];
       for (const path of paths) {
-        const text = (await zip.file(path)!.async("string")).replace(/^﻿/, "");
+        const text = strFromU8(entries[path]!).replace(/^﻿/, "");
         const parsed = Papa.parse<Record<string, string>>(text, {
           header: true,
           skipEmptyLines: "greedy",

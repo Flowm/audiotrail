@@ -83,9 +83,9 @@ const datasets: Array<{ name: string; blurb: string }> = [
     <section>
       <p class="overline">Colophon</p>
       <p class="text-ink-600 dark:text-ink-300 mt-4 max-w-2xl text-sm leading-relaxed">
-        Built with Vue 3, Vite, Tailwind CSS and Apache ECharts; zips are opened with JSZip and CSVs parsed with Papa Parse. Type is set in Fraunces, Schibsted Grotesk and IBM Plex
-        Mono, self-hosted so the app makes no font-CDN requests. Opt-in cover art is resolved through the Audnexus API. Audiotrail is an independent project and is not affiliated
-        with, endorsed by, or connected to Audible or Amazon; all trademarks belong to their owners.
+        Built with Vue 3, Vite, Tailwind CSS and Apache ECharts; zips are opened with fflate and CSVs parsed with Papa Parse. Type is set in Fraunces, Schibsted Grotesk and IBM
+        Plex Mono, self-hosted so the app makes no font-CDN requests. Opt-in cover art is resolved through the Audnexus API. Audiotrail is an independent project and is not
+        affiliated with, endorsed by, or connected to Audible or Amazon; all trademarks belong to their owners.
       </p>
       <p class="text-ink-400 dark:text-ink-500 mt-4 font-mono text-xs">Build {{ buildSha }} · {{ buildDate }}</p>
     </section>

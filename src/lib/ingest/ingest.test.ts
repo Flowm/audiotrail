@@ -1,4 +1,4 @@
-import JSZip from "jszip";
+import { strToU8, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 
 import { TakeoutError } from "@/types/takeout";
@@ -22,10 +22,10 @@ const ACCOUNT_JSON = JSON.stringify({
   "audible.de": { "Creation Date": "2021-06-07T23:55:30.000Z" },
 });
 
-async function buildZip(entries: Record<string, string>): Promise<ArrayBuffer> {
-  const zip = new JSZip();
-  for (const [path, content] of Object.entries(entries)) zip.file(path, content);
-  return zip.generateAsync({ type: "arraybuffer" });
+async function buildZip(entries: Record<string, string>): Promise<Uint8Array> {
+  const files: Record<string, Uint8Array> = {};
+  for (const [path, content] of Object.entries(entries)) files[path] = strToU8(content);
+  return zipSync(files);
 }
 
 describe("ingestTakeout", () => {

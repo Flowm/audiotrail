@@ -10,7 +10,7 @@ you, and a yearly _Wrapped_ story to top it off.
 ## Privacy, in concrete terms
 
 - **Nothing is uploaded.** The zip is parsed by JavaScript inside your tab
-  (JSZip + Papa Parse). There is no backend, no account, no analytics, no cookies.
+  (fflate + Papa Parse). There is no backend, no account, no analytics, no cookies.
 - **Nothing is stored.** Close the tab and the data is gone; drop the zip again next
   time. `localStorage` holds only display preferences (dark mode, the covers toggle).
 - **No third-party requests** — fonts are self-hosted, charts render locally. The one
@@ -59,7 +59,7 @@ npm run build      # type-check (vue-tsc) + production build
 ```
 
 Stack: Vue 3 + Vite + TypeScript, Tailwind CSS v4, Apache ECharts via vue-echarts,
-JSZip, Papa Parse. Three strictly separated layers: `lib/ingest` (zip → normalized
+fflate, Papa Parse. Three strictly separated layers: `lib/ingest` (zip → normalized
 models, framework-free), `lib/derive` (pure aggregation functions), and the Vue
 presentation layer. All parsing logic is unit-tested against synthetic fixtures —
 never against real data.
