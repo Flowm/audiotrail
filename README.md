@@ -52,10 +52,11 @@ shows a "What we found" report of exactly which datasets were recognized.
 ## Development
 
 ```sh
-npm install
-npm run dev        # start the dev server
-npm test           # vitest unit + integration tests
-npm run build      # type-check (vue-tsc) + production build
+mise install         # provision Node 24 + pnpm 11 (see mise.toml); or bring your own
+pnpm install
+pnpm dev           # start the dev server
+pnpm test          # vitest unit + integration tests
+pnpm build         # type-check (vue-tsc) + production build
 ```
 
 Stack: Vue 3 + Vite + TypeScript, Tailwind CSS v4, Apache ECharts via vue-echarts,
