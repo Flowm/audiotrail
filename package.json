@@ -12,7 +12,8 @@
     "type-check": "vue-tsc --noEmit",
     "lint": "oxlint && oxfmt --check && vue-tsc",
     "lint:fix": "oxlint --fix && oxfmt --write",
-    "deploy": "pnpm build && wrangler deploy"
+    "deploy": "pnpm build && wrangler deploy",
+    "deploy:preview": "pnpm build && wrangler versions upload --preview-alias preview-$(git rev-parse HEAD | head -c 8)"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.2.9",
