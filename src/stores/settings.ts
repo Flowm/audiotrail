@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { ref, watch } from "vue";
 
@@ -23,8 +24,11 @@ function writeFlag(key: string, value: boolean): void {
 }
 
 export const useSettingsStore = defineStore("settings", () => {
+  // darkMode keeps the hand-rolled "1"/"0" format: the anti-FOUC script in
+  // index.html reads this key from the <head> before any module loads and
+  // hard-codes that format, so useLocalStorage's JSON boolean would break it.
   const darkMode = ref(readFlag(DARK_KEY) ?? window.matchMedia("(prefers-color-scheme: dark)").matches);
-  const loadRealCovers = ref(readFlag(COVERS_KEY) ?? false);
+  const loadRealCovers = useLocalStorage(COVERS_KEY, false);
   const selectedProfile = ref<string>("all");
 
   watch(
@@ -35,8 +39,6 @@ export const useSettingsStore = defineStore("settings", () => {
     },
     { immediate: true },
   );
-
-  watch(loadRealCovers, (value) => writeFlag(COVERS_KEY, value));
 
   function toggleDark(): void {
     darkMode.value = !darkMode.value;

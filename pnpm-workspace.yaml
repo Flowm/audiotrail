@@ -5,3 +5,8 @@ allowBuilds:
   esbuild: false
   sharp: false
   workerd: true
+
+catalog:
+  typescript: ^6.0.3
+  oxlint: ^1.72.0
+  oxfmt: ^0.57.0
