@@ -8,16 +8,6 @@
       content="Audiotrail turns your Audible data takeout into a private dashboard — parsed entirely in your browser. No uploads, no servers, no tracking."
     />
     <title>Audiotrail — your Audible history, visualized locally</title>
-    <script>
-      try {
-        var stored = localStorage.getItem("audiotrail:dark");
-        if (stored === "1" || (stored === null && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-          document.documentElement.classList.add("dark");
-        }
-      } catch (e) {
-        /* private mode — default to light */
-      }
-    </script>
   </head>
   <body>
     <div id="app"></div>
