@@ -2,10 +2,18 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "audiotrail-dev",
-      "runtimeExecutable": "npm",
+      "name": "dev",
+      "runtimeExecutable": "pnpm",
       "runtimeArgs": ["run", "dev"],
-      "port": 5173
+      "port": 5185,
+      "autoPort": true
+    },
+    {
+      "name": "preview",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "preview"],
+      "port": 5186,
+      "autoPort": true
     }
   ]
 }

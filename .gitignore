@@ -5,3 +5,5 @@ coverage/
 .vite/
 *.local
 .DS_Store
+.claude/*
+!.claude/launch.json

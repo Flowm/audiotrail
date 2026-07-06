@@ -11,6 +11,8 @@ import { VitePWA } from "vite-plugin-pwa";
 const buildDate = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 const buildSha = execSync("git rev-parse --short HEAD").toString().trim();
 
+const port = process.env.PORT ? Number(process.env.PORT) : undefined;
+
 /**
  * Serves the developer's own gitignored sample takeout (data/Audible.zip)
  * at /__sample/Audible.zip during `vite serve` only. `apply: 'serve'` means
@@ -78,6 +80,8 @@ export default defineConfig({
       },
     }),
   ],
+  server: { port, strictPort: port !== undefined },
+  preview: { port, strictPort: port !== undefined },
   resolve: {
     tsconfigPaths: true,
   },
