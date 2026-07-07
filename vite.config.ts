@@ -105,15 +105,11 @@ export default defineConfig({
         handler(level, log);
       },
       output: {
-        // Vite 8 runs on Rolldown, where the object form of manualChunks is
-        // gone; codeSplitting.groups is its replacement. captured modules pull
-        // in their deps by default, so echarts' zrender lands here too.
         codeSplitting: {
           groups: [
             { name: "vue", test: /@vue|vue-router|pinia|@vueuse/, priority: 60 },
             { name: "echarts", test: /echarts|vue-echarts/, priority: 30 },
             { name: "vendor", test: /node_modules/, priority: 10 },
-            { name: "app", test: /src/, priority: 1 },
           ],
         },
       },
