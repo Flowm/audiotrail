@@ -51,9 +51,17 @@ shows a "What we found" report of exactly which datasets were recognized.
 
 ## Development
 
+Set up the toolchain and hooks, then install dependencies:
+
 ```sh
-mise install         # provision Node 24 + pnpm 11 (see mise.toml); or bring your own
+mise trust && mise install   # toolchain (node, pnpm, prek)
+mise setup                   # install the pre-commit hooks
 pnpm install
+```
+
+Then the usual scripts:
+
+```sh
 pnpm dev           # start the dev server
 pnpm test          # vitest unit + integration tests
 pnpm build         # type-check (vue-tsc) + production build
