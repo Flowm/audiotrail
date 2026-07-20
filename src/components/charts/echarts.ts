@@ -1,5 +1,14 @@
 import { BarChart, HeatmapChart, LineChart, PieChart, ScatterChart, SankeyChart } from "echarts/charts";
-import { CalendarComponent, DataZoomComponent, GridComponent, LegendComponent, MarkLineComponent, TooltipComponent, VisualMapComponent } from "echarts/components";
+import {
+  CalendarComponent,
+  DataZoomComponent,
+  GridComponent,
+  LegendComponent,
+  MarkLineComponent,
+  MarkPointComponent,
+  TooltipComponent,
+  VisualMapComponent,
+} from "echarts/components";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 
@@ -21,5 +30,6 @@ use([
   VisualMapComponent,
   CalendarComponent,
   MarkLineComponent,
+  MarkPointComponent,
   CanvasRenderer,
 ]);

@@ -76,8 +76,11 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChar
                 label: {
                   show: true,
                   position: "bottom",
-                  distance: 4,
-                  color: p.text,
+                  distance: 6,
+                  color: p.tooltipText,
+                  backgroundColor: p.tooltipBg,
+                  padding: [2, 5],
+                  borderRadius: 3,
                   fontFamily: MONO,
                   fontSize: 9,
                   formatter: (params: unknown) => formatEur(Number((params as { value: number }).value) || 0),
