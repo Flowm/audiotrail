@@ -2,7 +2,7 @@ import type { EChartsOption } from "echarts";
 
 import type { SankeyData } from "@/lib/derive/people";
 
-import { baseTooltip } from "./common";
+import { baseTooltip, withAlpha } from "./common";
 import type { ChartPalette } from "./types";
 
 /**
@@ -38,9 +38,12 @@ export function sankeyOption(data: SankeyData, p: ChartPalette, formatValue: (va
         top: 8,
         bottom: 8,
         nodeWidth: 12,
-        nodeGap: 10,
+        nodeGap: 14,
         emphasis: { focus: "adjacency" },
         lineStyle: { color: "gradient", opacity: 0.28, curveness: 0.55 },
+        // Crowded tails would otherwise stack labels on top of each other;
+        // hidden ones stay reachable through the tooltip.
+        labelLayout: { hideOverlap: true },
         label: {
           color: p.textStrong,
           fontSize: 11,
@@ -49,7 +52,10 @@ export function sankeyOption(data: SankeyData, p: ChartPalette, formatValue: (va
         data: data.nodes.map((node, index) => ({
           name: node.name,
           label: node.label,
-          itemStyle: { color: p.series[index % p.series.length], borderWidth: 0 },
+          itemStyle: {
+            color: node.label === "everyone else" ? withAlpha(p.text, 0.35) : p.series[index % p.series.length],
+            borderWidth: 0,
+          },
         })),
         links: data.links,
       },

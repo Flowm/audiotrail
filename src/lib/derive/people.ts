@@ -207,9 +207,11 @@ export interface SankeyData {
 /**
  * Author → narrator flows weighted by listening hours. Node names are
  * prefixed ('a:' / 'n:') so a person appearing on both sides cannot create
- * a cycle; the display label carries the bare name.
+ * a cycle; the display label carries the bare name. Narrators beyond the
+ * top `maxNarrators` fold into one "everyone else" node — otherwise their
+ * labels pile into an unreadable stack at the bottom of the chart.
  */
-export function authorNarratorSankey(books: BookStats[], maxAuthors = 10): SankeyData {
+export function authorNarratorSankey(books: BookStats[], maxAuthors = 10, maxNarrators = 12): SankeyData {
   const linkMs = new Map<string, number>();
   const authorTotals = new Map<string, number>();
 
@@ -233,16 +235,35 @@ export function authorNarratorSankey(books: BookStats[], maxAuthors = 10): Sanke
       .map(([name]) => name),
   );
 
-  const nodes = new Map<string, string>();
-  const links: SankeyData["links"] = [];
+  const narratorTotals = new Map<string, number>();
   for (const [key, ms] of linkMs) {
     const [author, narrator] = key.split("\u0000") as [string, string];
     if (!topAuthors.has(author)) continue;
+    narratorTotals.set(narrator, (narratorTotals.get(narrator) ?? 0) + ms);
+  }
+  const rankedNarrators = [...narratorTotals.entries()].toSorted((a, b) => b[1] - a[1]).map(([name]) => name);
+  // Only fold the tail when it saves more than one label slot.
+  const keptNarrators = new Set(rankedNarrators.length > maxNarrators + 1 ? rankedNarrators.slice(0, maxNarrators) : rankedNarrators);
+
+  const nodes = new Map<string, string>();
+  const linkTotals = new Map<string, number>();
+  for (const [key, ms] of linkMs) {
+    const [author, narrator] = key.split("\u0000") as [string, string];
+    if (!topAuthors.has(author)) continue;
+    const kept = keptNarrators.has(narrator);
+    const target = kept ? `n:${narrator}` : "n:everyone else";
+    nodes.set(`a:${author}`, author);
+    nodes.set(target, kept ? narrator : "everyone else");
+    const linkKey = `a:${author}\u0000${target}`;
+    linkTotals.set(linkKey, (linkTotals.get(linkKey) ?? 0) + ms);
+  }
+
+  const links: SankeyData["links"] = [];
+  for (const [key, ms] of linkTotals) {
+    const separator = key.indexOf("\u0000");
     const hours = Math.round((ms / 3_600_000) * 10) / 10;
     if (hours <= 0) continue;
-    nodes.set(`a:${author}`, author);
-    nodes.set(`n:${narrator}`, narrator);
-    links.push({ source: `a:${author}`, target: `n:${narrator}`, value: hours });
+    links.push({ source: key.slice(0, separator), target: key.slice(separator + 1), value: hours });
   }
 
   return {
