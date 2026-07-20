@@ -175,8 +175,8 @@ function openDashboard(): void {
           </span>
         </div>
 
-        <details class="panel group mt-10 w-full px-6 py-5">
-          <summary class="text-ink-700 dark:text-ink-200 flex cursor-pointer list-none items-center justify-between text-sm font-medium">
+        <details class="panel group mt-10 w-full">
+          <summary class="text-ink-700 dark:text-ink-200 flex cursor-pointer list-none items-center justify-between px-6 py-5 text-sm font-medium">
             How do I get my data?
             <svg
               class="text-ink-400 h-4 w-4 transition-transform group-open:rotate-180"
@@ -190,7 +190,7 @@ function openDashboard(): void {
               <path d="m6 9 6 6 6-6" />
             </svg>
           </summary>
-          <div class="mt-5">
+          <div class="px-6 pb-5">
             <TakeoutSteps />
           </div>
         </details>
