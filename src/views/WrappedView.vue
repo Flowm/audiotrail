@@ -93,7 +93,7 @@ function close(): void {
           {{ formatHours(stats.totalMs) }}
         </p>
         <p class="text-ink-500 dark:text-ink-400 mt-6 max-w-md text-sm leading-relaxed">
-          That's {{ straightDays }} days straight — spread over {{ formatNumber(stats.daysActive) }} listening days and {{ formatNumber(stats.sessions) }} sessions.
+          That's {{ straightDays }} days straight, spread over {{ formatNumber(stats.daysActive) }} listening days and {{ formatNumber(stats.sessions) }} sessions.
           {{ formatPercent(Math.min(1, stats.activeDayShare)) }} of {{ year }} had audio in it.
         </p>
       </section>

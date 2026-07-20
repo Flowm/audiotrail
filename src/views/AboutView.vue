@@ -14,7 +14,7 @@ const datasets: Array<{ name: string; blurb: string }> = [
   { name: "Wishlist", blurb: "Wishes added, fulfilled, deleted — and how long they waited." },
   { name: "Collections", blurb: "Your shelves, both your own and the built-in system ones." },
   { name: "Search sessions", blurb: "What you searched for, and whether you clicked or bought." },
-  { name: "Search results", blurb: "Which result positions you actually clicked." },
+  { name: "Search results", blurb: "Which result positions you clicked." },
   { name: "Playback metrics", blurb: "A recent technical sample: audio output, app events, playback state." },
   { name: "Cart history", blurb: "What passed through your basket on the way to checkout." },
   { name: "Returns", blurb: "Titles you sent back and the credits refunded." },
@@ -31,7 +31,7 @@ const datasets: Array<{ name: string; blurb: string }> = [
       <h1 class="font-display text-ink-900 dark:text-paper-50 mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">A private window into your listening</h1>
       <p class="text-ink-600 dark:text-ink-300 mt-5 max-w-2xl text-[15px] leading-relaxed">
         Audible's GDPR data takeout is a zip full of CSV files — technically yours, practically unreadable. Audiotrail turns it into something you can actually explore: your
-        listening rhythm over the years, the books you abandoned at 90%, what a listening hour really cost you. It is a static web page with no backend; the analysis runs entirely
+        listening rhythm over the years, the books you abandoned at 90%, what a listening hour really cost you. It's a static web page with no backend; the analysis runs entirely
         on your machine.
       </p>
     </section>
@@ -41,7 +41,7 @@ const datasets: Array<{ name: string; blurb: string }> = [
       <ul class="text-ink-600 dark:text-ink-300 mt-4 max-w-2xl space-y-3 text-sm leading-relaxed">
         <li class="flex gap-3">
           <span class="bg-accent-500 mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" />
-          Your zip is read and parsed by JavaScript inside this tab. No byte of it is ever uploaded — there is no server to upload to.
+          Your zip is read and parsed by JavaScript inside this tab. No byte of it is ever uploaded. There is no server to upload to.
         </li>
         <li class="flex gap-3">
           <span class="bg-accent-500 mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" />

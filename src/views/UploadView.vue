@@ -66,7 +66,7 @@ function openDashboard(): void {
         <span class="text-accent-600 dark:text-accent-400">none of it leaves this tab.</span>
       </h1>
       <p class="text-ink-500 dark:text-ink-400 mt-5 max-w-lg text-center text-[15px] leading-relaxed">
-        Audiotrail turns your Audible data takeout into an interactive dashboard — parsed entirely in your browser. No uploads, no servers, no tracking.
+        Audiotrail turns your Audible data takeout into an interactive dashboard, parsed entirely in your browser. No uploads, no servers, no tracking.
       </p>
 
       <!-- Drop zone -->
@@ -100,7 +100,7 @@ function openDashboard(): void {
         <p class="text-ink-700 dark:text-ink-200 text-sm font-medium">
           Drop
           <code class="bg-paper-200/70 dark:bg-ink-800 rounded px-1 py-0.5 font-mono text-[12px]">Audible.zip</code>
-          here — or click to browse
+          here, or click to browse
         </p>
         <p class="text-ink-400 dark:text-ink-500 font-mono text-[10px] tracking-[0.2em] uppercase">parsed locally · nothing uploaded</p>
         <input ref="fileInput" type="file" accept=".zip,application/zip" class="hidden" @change="onPick" />

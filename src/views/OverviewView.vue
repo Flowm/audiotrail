@@ -215,6 +215,6 @@ const yoy = computed(() => {
       </p>
     </template>
 
-    <EmptyState v-else title="No listening history in this takeout" message="The Audible.Listening folder seems to be missing or empty, so the overview has nothing to chart." />
+    <EmptyState v-else title="No listening history in this takeout" message="The Audible.Listening folder is missing or empty, so the overview has nothing to chart." />
   </div>
 </template>
