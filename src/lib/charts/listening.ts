@@ -105,6 +105,23 @@ export function rhythmOption(granularity: RhythmGranularity, days: DayTotal[], p
   // default view: roughly the most recent year
   const startIndex = granularity === "day" ? Math.max(0, categories.length - 366) : granularity === "week" ? Math.max(0, categories.length - 53) : 0;
 
+  // Auto-interval labels on daily/weekly categories print raw, repeating
+  // YYYY-MM strings. Tick at month boundaries instead, thinned to quarters
+  // or Januarys when the span gets long.
+  const monthOf = (value: string): string => value.slice(0, 7);
+  const monthCount = new Set(categories.map(monthOf)).size;
+  const monthStep = monthCount > 90 ? 12 : monthCount > 30 ? 3 : 1;
+  const isMonthTick = (index: number): boolean => {
+    const current = categories[index];
+    if (current === undefined) return false;
+    if (index > 0 && monthOf(categories[index - 1]!) === monthOf(current)) return false;
+    return (Number(current.slice(5, 7)) - 1) % monthStep === 0;
+  };
+  const axisLabel =
+    granularity === "month"
+      ? { ...monoAxisLabel(p), formatter: (value: string) => formatMonth(value) }
+      : { ...monoAxisLabel(p), interval: isMonthTick, formatter: (value: string) => formatMonth(monthOf(value)) };
+
   return {
     grid: { left: 8, right: 14, top: 34, bottom: 56, containLabel: true },
     legend: {
@@ -126,10 +143,7 @@ export function rhythmOption(granularity: RhythmGranularity, days: DayTotal[], p
       data: categories,
       axisLine: { lineStyle: { color: p.axis } },
       axisTick: { show: false },
-      axisLabel: {
-        ...monoAxisLabel(p),
-        formatter: (value: string) => (granularity === "month" ? formatMonth(value) : value.slice(0, 7)),
-      },
+      axisLabel,
       splitLine: { show: false },
     },
     yAxis: {
