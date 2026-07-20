@@ -5,9 +5,9 @@ import BaseChart from "@/components/charts/BaseChart.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
 import SectionHeader from "@/components/ui/SectionHeader.vue";
 import StatCard from "@/components/ui/StatCard.vue";
+import TopBooksList from "@/components/ui/TopBooksList.vue";
 import { useChartTheme } from "@/composables/useChartTheme";
 import { useDataset } from "@/composables/useDataset";
-import { topBooksOption } from "@/lib/charts/books";
 import { calendarHeatmapOption } from "@/lib/charts/calendar";
 import { cumulativeHoursOption } from "@/lib/charts/trend";
 import { cumulative, longestStreak, yearlyTotals } from "@/lib/derive/time";
@@ -71,7 +71,7 @@ const heatmapOption = computed(() => (days.value.length > 0 && selectedYear.valu
 
 const cumulativeOption = computed(() => (days.value.length > 0 ? cumulativeHoursOption(cumulative(days.value), palette.value) : null));
 
-const topBooksOpt = computed(() => (books.value.some((book) => book.totalMs > 0) ? topBooksOption(books.value, 5, palette.value) : null));
+const hasListenedBooks = computed(() => books.value.some((book) => book.totalMs > 0));
 
 // ----- year over year -------------------------------------------------------
 
@@ -180,8 +180,9 @@ const yoy = computed(() => {
         </div>
         <div class="space-y-3 lg:col-span-2">
           <SectionHeader title="Most-heard books" hint="top 5 by hours" />
-          <div class="panel p-3 sm:p-4">
-            <BaseChart :option="topBooksOpt" :height="280" empty-title="No full-title listening yet" />
+          <div class="panel px-5 py-4">
+            <TopBooksList v-if="hasListenedBooks" :books="books" />
+            <p v-else class="text-ink-400 dark:text-ink-500 py-10 text-center text-sm">No full-title listening yet</p>
           </div>
         </div>
       </section>
