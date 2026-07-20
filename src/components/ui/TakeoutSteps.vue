@@ -9,7 +9,7 @@
       <p class="text-ink-600 dark:text-ink-300 text-sm leading-relaxed">
         <template v-if="step === 1">Sign in to your Amazon / Audible account.</template>
         <template v-else-if="step === 2"> Go to <em>Manage your data</em> → <em>Request your data</em> → <em>Audible</em>. </template>
-        <template v-else-if="step === 3"> Amazon emails you a download link. According to their notice this can take up to a month. </template>
+        <template v-else-if="step === 3"> Amazon emails you a download link, usually within 1–2 days (their notice allows up to a month). </template>
         <template v-else>
           Drop the resulting
           <code class="bg-paper-200/70 dark:bg-ink-800 rounded px-1 py-0.5 font-mono text-[12px]">Audible.zip</code>
