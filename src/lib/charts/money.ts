@@ -3,7 +3,7 @@ import type { EChartsOption } from "echarts";
 import type { MonthlySpend, YearCost } from "@/lib/derive/money";
 import { formatEur, formatMonth } from "@/lib/format";
 
-import { baseTooltip, monoAxisLabel, withAlpha } from "./common";
+import { baseTooltip, MONO, monoAxisLabel, withAlpha } from "./common";
 import type { ChartPalette } from "./types";
 
 /** Monthly membership + cash bars with a cumulative line on a second axis. */
@@ -14,6 +14,16 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChar
     runningTotal += row.membership + row.cash;
     return Math.round(runningTotal * 100) / 100;
   });
+
+  // One gift-buying spree shouldn't flatten years of regular months into
+  // slivers: cap the bar axis near the 95th percentile when there's a real
+  // outlier, and flag clipped months with their true total.
+  const totals = rows.map((row) => row.membership + row.cash);
+  const sorted = totals.toSorted((a, b) => a - b);
+  const p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))] ?? 0;
+  const maxTotal = sorted[sorted.length - 1] ?? 0;
+  const cap = p95 > 0 && maxTotal > p95 * 1.6 ? Math.ceil((p95 * 1.25) / 5) * 5 : null;
+  const clipped = cap === null ? [] : rows.filter((_, index) => totals[index]! > cap);
 
   return {
     grid: { left: 52, right: 64, top: 30, bottom: 46 },
@@ -39,6 +49,7 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChar
     yAxis: [
       {
         type: "value",
+        max: cap ?? undefined,
         axisLabel: { ...monoAxisLabel(p), formatter: "€{value}" },
         splitLine: { lineStyle: { color: p.split } },
       },
@@ -55,6 +66,28 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChar
         stack: "spend",
         itemStyle: { color: p.accent },
         data: rows.map((row) => row.membership),
+        markPoint:
+          cap === null
+            ? undefined
+            : {
+                symbol: "triangle",
+                symbolSize: 7,
+                itemStyle: { color: p.accent },
+                label: {
+                  show: true,
+                  position: "bottom",
+                  distance: 4,
+                  color: p.text,
+                  fontFamily: MONO,
+                  fontSize: 9,
+                  formatter: (params: unknown) => formatEur(Number((params as { value: number }).value) || 0),
+                },
+                data: clipped.map((row) => ({
+                  name: row.month,
+                  coord: [row.month, cap * 0.97],
+                  value: Math.round((row.membership + row.cash) * 100) / 100,
+                })),
+              },
       },
       {
         name: "shop (cash)",
@@ -69,21 +102,8 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChar
         yAxisIndex: 1,
         data: cumulative,
         showSymbol: false,
-        lineStyle: { color: p.series[4], width: 1.8 },
+        lineStyle: { color: withAlpha(p.series[4]!, 0.75), width: 1.2 },
         itemStyle: { color: p.series[4] },
-        areaStyle: {
-          color: {
-            type: "linear",
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: withAlpha(p.series[4]!, 0.12) },
-              { offset: 1, color: withAlpha(p.series[4]!, 0) },
-            ],
-          },
-        },
       },
     ],
   };
