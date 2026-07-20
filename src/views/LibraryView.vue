@@ -143,19 +143,19 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
         </div>
 
         <div class="panel overflow-x-auto">
-          <table class="w-full min-w-[760px] text-left text-sm">
+          <table class="w-full min-w-[760px] table-fixed text-left text-sm">
             <thead>
               <tr class="border-paper-200 dark:border-ink-800 border-b">
                 <th
                   v-for="column in [
-                    ['title', 'Title'],
-                    ['length', 'Length'],
-                    ['purchased', 'Purchased'],
-                    ['listened', 'Listened'],
-                    ['completion', 'Completion'],
-                  ] as [SortKey, string][]"
+                    ['title', 'Title', ''],
+                    ['length', 'Length', 'w-24'],
+                    ['purchased', 'Purchased', 'w-28'],
+                    ['listened', 'Listened', 'w-24'],
+                    ['completion', 'Completion', 'w-36'],
+                  ] as [SortKey, string, string][]"
                   :key="column[0]"
-                  class="px-4 py-2.5"
+                  :class="['px-4 py-2.5', column[2]]"
                 >
                   <button type="button" class="hover:text-ink-700 dark:hover:text-ink-200 flex items-center gap-1 overline" @click="setSort(column[0])">
                     {{ column[1] }}
@@ -164,12 +164,12 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                     </span>
                   </button>
                 </th>
-                <th class="px-4 py-2.5 overline">Status</th>
+                <th class="w-28 px-4 py-2.5 overline">Status</th>
               </tr>
             </thead>
             <tbody class="divide-paper-200/60 dark:divide-ink-800/60 divide-y">
               <tr v-for="book in visible" :key="book.key" class="align-middle">
-                <td class="max-w-[320px] px-4 py-2">
+                <td class="px-4 py-2">
                   <div class="flex items-center gap-3">
                     <BookCover :asin="book.asin" :title="book.title" class="w-9 text-[10px]" />
                     <div class="min-w-0">
@@ -195,9 +195,13 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                 <td class="px-4 py-2">
                   <div v-if="book.completion !== null" class="flex items-center gap-2">
                     <span class="bg-paper-200 dark:bg-ink-800 h-1.5 w-20 overflow-hidden rounded-full">
-                      <span class="bg-accent-500 block h-full rounded-full" :style="{ width: `${Math.round(book.completion * 100)}%` }" />
+                      <!-- finished bars fade back so the rare in-progress rows stand out -->
+                      <span
+                        :class="['block h-full rounded-full', book.completion >= 0.995 ? 'bg-accent-500/30 dark:bg-accent-400/25' : 'bg-accent-500']"
+                        :style="{ width: `${Math.round(book.completion * 100)}%` }"
+                      />
                     </span>
-                    <span class="text-ink-500 dark:text-ink-400 font-mono text-[11px]">
+                    <span :class="['font-mono text-[11px]', book.completion >= 0.995 ? 'text-ink-400 dark:text-ink-600' : 'text-ink-500 dark:text-ink-400']">
                       {{ formatPercent(book.completion) }}
                     </span>
                   </div>
