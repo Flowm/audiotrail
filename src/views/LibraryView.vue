@@ -149,9 +149,9 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                 <th
                   v-for="column in [
                     ['title', 'Title', ''],
-                    ['length', 'Length', 'w-24'],
-                    ['purchased', 'Purchased', 'w-28'],
-                    ['listened', 'Listened', 'w-24'],
+                    ['length', 'Length', 'w-28'],
+                    ['purchased', 'Purchased', 'w-32'],
+                    ['listened', 'Listened', 'w-28'],
                     ['completion', 'Completion', 'w-36'],
                   ] as [SortKey, string, string][]"
                   :key="column[0]"
@@ -183,13 +183,13 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                     </div>
                   </div>
                 </td>
-                <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs">
+                <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs whitespace-nowrap">
                   {{ book.bookLengthMs ? formatDuration(book.bookLengthMs) : "—" }}
                 </td>
-                <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs">
+                <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs whitespace-nowrap">
                   {{ book.library?.purchaseDate ? formatDate(book.library.purchaseDate) : "—" }}
                 </td>
-                <td class="text-ink-700 dark:text-ink-200 px-4 py-2 font-mono text-xs">
+                <td class="text-ink-700 dark:text-ink-200 px-4 py-2 font-mono text-xs whitespace-nowrap">
                   {{ book.totalMs > 0 ? formatDuration(book.totalMs) : "—" }}
                 </td>
                 <td class="px-4 py-2">
