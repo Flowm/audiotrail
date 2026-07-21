@@ -138,7 +138,7 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
           </span>
           <span class="text-ink-700 dark:text-ink-200 text-sm font-medium"> Load real cover art </span>
         </label>
-        <p class="text-ink-400 dark:text-ink-500 font-mono text-[10px] tracking-[0.14em] uppercase">off = private placeholders · on = sends ASINs to Audnexus + Amazon</p>
+        <p class="text-ink-400 dark:text-ink-500 font-mono text-[10px] tracking-[0.14em] uppercase">off = private placeholders · on = ASINs to Audnexus, images from Amazon</p>
       </section>
 
       <!-- Table -->

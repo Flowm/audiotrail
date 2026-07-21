@@ -55,8 +55,9 @@ const datasets: Array<{ name: string; blurb: string }> = [
           <span class="bg-accent-500 mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" />
           <span>
             One deliberate exception: the opt-in cover-art toggle (off by default). Turning it on sends each book's ASIN to
-            <a href="https://audnex.us" target="_blank" rel="noopener" class="underline underline-offset-2">Audnexus</a> (a community Audible-metadata API) and loads the covers
-            from Amazon's image CDN, so both services see your library's book IDs. Leave it off and you get generated placeholder covers.
+            <a href="https://audnex.us" target="_blank" rel="noopener" class="underline underline-offset-2">Audnexus</a> (a community Audible-metadata API), which answers with a
+            cover URL on Amazon's image CDN. Audnexus sees your library's ASINs; Amazon only sees the resulting image requests. Leave it off and you get generated placeholder
+            covers.
           </span>
         </li>
       </ul>
