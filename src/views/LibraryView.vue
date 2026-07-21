@@ -27,12 +27,21 @@ const withLibrary = computed(() => books.value.filter((book) => book.library !==
 
 // ----- table state -----------------------------------------------------------
 
-type SortKey = "title" | "length" | "purchased" | "listened" | "completion";
+type SortKey = "title" | "length" | "purchased" | "listened" | "ratio" | "completion";
 const sortKey = ref<SortKey>("listened");
 const sortDesc = ref(true);
 const query = ref("");
 const showAll = ref(false);
 const PAGE = 30;
+
+/**
+ * Listened ÷ length. Distinct from completion (furthest position): a value
+ * above 1 means re-listening — whole extra passes or heavy rewinding.
+ */
+function listenRatio(book: BookStats): number | null {
+  if (book.totalMs <= 0 || book.bookLengthMs === null || book.bookLengthMs <= 0) return null;
+  return book.totalMs / book.bookLengthMs;
+}
 
 function setSort(key: SortKey): void {
   if (sortKey.value === key) {
@@ -63,6 +72,8 @@ const filtered = computed(() => {
         return book.library?.purchaseDate ?? -1;
       case "listened":
         return book.totalMs;
+      case "ratio":
+        return listenRatio(book) ?? -1;
       case "completion":
         return book.completion ?? -1;
     }
@@ -143,7 +154,7 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
         </div>
 
         <div class="panel overflow-x-auto">
-          <table class="w-full min-w-[760px] table-fixed text-left text-sm">
+          <table class="w-full min-w-[860px] table-fixed text-left text-sm">
             <thead>
               <tr class="border-paper-200 dark:border-ink-800 border-b">
                 <th
@@ -152,6 +163,7 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                     ['length', 'Length', 'w-28'],
                     ['purchased', 'Purchased', 'w-32'],
                     ['listened', 'Listened', 'w-28'],
+                    ['ratio', 'Times heard', 'w-28'],
                     ['completion', 'Completion', 'w-36'],
                   ] as [SortKey, string, string][]"
                   :key="column[0]"
@@ -191,6 +203,13 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                 </td>
                 <td class="text-ink-700 dark:text-ink-200 px-4 py-2 font-mono text-xs whitespace-nowrap">
                   {{ book.totalMs > 0 ? formatDuration(book.totalMs) : "—" }}
+                </td>
+                <td class="px-4 py-2 font-mono text-xs whitespace-nowrap" :title="listenRatio(book) !== null ? 'listened ÷ length' : undefined">
+                  <!-- re-listened books (≥1.2×) get the accent so they jump out -->
+                  <span v-if="listenRatio(book) !== null" :class="listenRatio(book)! >= 1.2 ? 'text-accent-700 dark:text-accent-300' : 'text-ink-500 dark:text-ink-400'">
+                    {{ listenRatio(book)!.toFixed(1) }}×
+                  </span>
+                  <span v-else class="text-ink-300 dark:text-ink-600">—</span>
                 </td>
                 <td class="px-4 py-2">
                   <div v-if="book.completion !== null" class="flex items-center gap-2">
