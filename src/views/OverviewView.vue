@@ -10,6 +10,7 @@ import { useChartTheme } from "@/composables/useChartTheme";
 import { useDataset } from "@/composables/useDataset";
 import { calendarHeatmapOption } from "@/lib/charts/calendar";
 import { cumulativeHoursOption } from "@/lib/charts/trend";
+import { purchaseOutlay } from "@/lib/derive/money";
 import { cumulative, longestStreak, yearlyTotals } from "@/lib/derive/time";
 import { formatDate, formatEur, formatHours, formatNumber } from "@/lib/format";
 import { useTakeoutStore } from "@/stores/takeout";
@@ -58,7 +59,7 @@ function spendIn(yearPrefix: string | null): number {
   const billings = takeout.bundle?.billings ?? [];
   const purchases = takeout.bundle?.purchases ?? [];
   const membership = billings.filter((b) => b.type === "Charge" && (yearPrefix === null || b.billingDate.startsWith(yearPrefix))).reduce((sum, b) => sum + (b.totalAmount ?? 0), 0);
-  const cash = purchases.filter((p) => p.type === "CASH" && (yearPrefix === null || p.orderPlaceDate.startsWith(yearPrefix))).reduce((sum, p) => sum + (p.pricePaid ?? 0), 0);
+  const cash = purchases.filter((p) => p.type === "CASH" && (yearPrefix === null || p.orderPlaceDate.startsWith(yearPrefix))).reduce((sum, p) => sum + purchaseOutlay(p), 0);
   return membership + cash;
 }
 

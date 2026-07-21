@@ -6,6 +6,30 @@ import { monthSpan, yearlyTotals, type DayTotal } from "./time";
 
 const round2 = (value: number): number => Math.round(value * 100) / 100;
 
+/**
+ * Actual money out for a purchase. Some takeouts (observed on audible.de)
+ * leave "Price Paid Member" at 0 even on paid orders; the gross charge is
+ * then regular price + tax + discount (discount is negative), which matches
+ * the order confirmation emails to the cent. Genuinely free orders come out
+ * at 0 either way because their discount cancels the regular price.
+ */
+export function purchaseOutlay(purchase: Purchase): number {
+  const paid = purchase.pricePaid ?? 0;
+  if (paid > 0) return paid;
+  return Math.max(0, round2((purchase.regularPrice ?? 0) + (purchase.tax ?? 0) + (purchase.discount ?? 0)));
+}
+
+// "3 extra Guthaben" / "5 Extra Guthaben" (audible.de), "DE - 3 Credit
+// Bundle Purchase" (Apple in-app, saleType ALC), "Audible Guthaben".
+const PACK_NAME = /guthaben|credit bundle|extra credit/i;
+
+/** Cash purchases of extra credits — ALOP orders plus app-store bundles. */
+export function isCreditPack(purchase: Purchase): boolean {
+  if (purchase.type !== "CASH") return false;
+  if (purchase.saleType === "ALOP") return true;
+  return PACK_NAME.test(purchase.productName ?? "");
+}
+
 export interface MonthlySpend {
   /** "YYYY-MM", or a bare "YYYY" after yearlySpend aggregation. */
   month: string;
@@ -51,8 +75,8 @@ export function monthlySpend(billings: BillingEvent[], purchases: Purchase[]): M
   for (const purchase of purchases) {
     if (purchase.type !== "CASH") continue;
     const entry = bucket(purchase.orderPlaceDate.slice(0, 7));
-    if (purchase.saleType === "ALOP") entry.creditPacks += purchase.pricePaid ?? 0;
-    else entry.shop += purchase.pricePaid ?? 0;
+    if (isCreditPack(purchase)) entry.creditPacks += purchaseOutlay(purchase);
+    else entry.shop += purchaseOutlay(purchase);
   }
   const months = [...byMonth.keys()].toSorted();
   if (months.length === 0) return [];
@@ -133,7 +157,7 @@ export function costPerYear(billings: BillingEvent[], purchases: Purchase[], day
   for (const purchase of purchases) {
     if (purchase.type !== "CASH") continue;
     const year = Number(purchase.orderPlaceDate.slice(0, 4));
-    spendByYear.set(year, (spendByYear.get(year) ?? 0) + (purchase.pricePaid ?? 0));
+    spendByYear.set(year, (spendByYear.get(year) ?? 0) + purchaseOutlay(purchase));
   }
 
   const hoursByYear = new Map(yearlyTotals(days).map((entry) => [entry.year, entry.ms / 3_600_000]));
@@ -178,8 +202,8 @@ export function creditsSavings(purchases: Purchase[], billings: BillingEvent[]):
       valueAtListPrice += purchase.regularPrice ?? 0;
       creditPurchaseCount += 1;
     }
-    if (purchase.type === "CASH" && purchase.saleType === "ALOP") {
-      creditPackCost += purchase.pricePaid ?? 0;
+    if (isCreditPack(purchase)) {
+      creditPackCost += purchaseOutlay(purchase);
     }
   }
   const membershipCost = billings.filter((billing) => billing.type === "Charge").reduce((sum, billing) => sum + (billing.totalAmount ?? 0), 0);

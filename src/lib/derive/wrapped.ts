@@ -1,6 +1,7 @@
 import type { BillingEvent, ListeningSession, Purchase } from "@/types/models";
 
 import { bookKey, type BookStats } from "./books";
+import { purchaseOutlay } from "./money";
 import { biggestDays, dailyTotals, longestStreak, monthlyTotals, type BigDay, type StreakInfo } from "./time";
 
 export interface WrappedHighlight {
@@ -87,7 +88,7 @@ export function wrappedStats(year: number, sessions: ListeningSession[], books: 
   const membership = billings
     .filter((billing) => billing.type === "Charge" && billing.billingDate.startsWith(prefix))
     .reduce((sum, billing) => sum + (billing.totalAmount ?? 0), 0);
-  const cash = purchases.filter((purchase) => purchase.type === "CASH" && purchase.orderPlaceDate.startsWith(prefix)).reduce((sum, purchase) => sum + (purchase.pricePaid ?? 0), 0);
+  const cash = purchases.filter((purchase) => purchase.type === "CASH" && purchase.orderPlaceDate.startsWith(prefix)).reduce((sum, purchase) => sum + purchaseOutlay(purchase), 0);
   const hasMoneyData = billings.length > 0 || purchases.length > 0;
   const spend = hasMoneyData ? Math.round((membership + cash) * 100) / 100 : null;
 

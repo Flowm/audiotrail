@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { isoDate } from "@/lib/ingest/normalize";
 import type { BillingEvent, Credit, IsoDate, Purchase } from "@/types/models";
 
-import { costPerYear, creditFlow, creditSankeyData, creditsSavings, expiringCredits, monthlySpend, unusedActiveCredits, yearlySpend } from "./money";
+import { costPerYear, creditFlow, creditSankeyData, creditsSavings, expiringCredits, isCreditPack, monthlySpend, purchaseOutlay, unusedActiveCredits, yearlySpend } from "./money";
 
 const d = (s: string): IsoDate => isoDate(s)!;
 
@@ -61,6 +61,26 @@ function credit(over: Partial<Credit> & { issueDate: IsoDate }): Credit {
     ...over,
   };
 }
+
+describe("purchaseOutlay / isCreditPack", () => {
+  it("reconstructs the gross charge when Price Paid Member is empty", () => {
+    // audible.de "5 Extra Guthaben": net 37.20 + 7% VAT 2.60 = 39.80 gross.
+    expect(
+      purchaseOutlay(purchase({ orderPlaceDate: d("2025-09-15"), orderId: "D1", type: "CASH", saleType: "ALOP", regularPrice: 37.2, tax: 2.6, discount: 0, pricePaid: 0 })),
+    ).toBe(39.8);
+    // fully discounted promo title stays free
+    expect(purchaseOutlay(purchase({ orderPlaceDate: d("2021-05-10"), orderId: "D2", type: "CASH", regularPrice: 19.58, tax: 0, discount: -19.58, pricePaid: 0 }))).toBe(0);
+    // a populated Price Paid Member wins
+    expect(purchaseOutlay(purchase({ orderPlaceDate: d("2024-01-01"), orderId: "D3", type: "CASH", regularPrice: 12, tax: 1, pricePaid: 9.95 }))).toBe(9.95);
+  });
+
+  it("detects ALOP orders and app-store credit bundles as packs", () => {
+    expect(isCreditPack(purchase({ orderPlaceDate: d("2025-09-15"), orderId: "D1", type: "CASH", saleType: "ALOP" }))).toBe(true);
+    expect(isCreditPack(purchase({ orderPlaceDate: d("2024-04-21"), orderId: "D2", type: "CASH", saleType: "ALC", productName: "DE - 3 Credit Bundle Purchase" }))).toBe(true);
+    expect(isCreditPack(purchase({ orderPlaceDate: d("2024-04-21"), orderId: "D3", type: "CASH", saleType: "ALC", productName: "Some Book" }))).toBe(false);
+    expect(isCreditPack(purchase({ orderPlaceDate: d("2024-04-21"), orderId: "D4", type: "CREDIT", saleType: "ALOP" }))).toBe(false);
+  });
+});
 
 describe("monthlySpend", () => {
   it("buckets charges and cash purchases by month, gap-filled", () => {
