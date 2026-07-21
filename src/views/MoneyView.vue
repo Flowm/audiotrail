@@ -125,7 +125,7 @@ const activeCredits = computed(() => unusedActiveCredits(credits.value));
           </div>
         </div>
         <div class="space-y-3 lg:col-span-2">
-          <SectionHeader title="Did credits pay off?" hint="list price vs what you paid" />
+          <SectionHeader title="Did credits pay off?" hint="cash price vs what you paid" />
           <div class="panel flex h-full flex-col justify-center gap-3 px-6 py-6">
             <p class="font-display text-ink-900 dark:text-paper-50 text-3xl font-semibold tracking-tight">
               <template v-if="savings.saved >= 0"> {{ formatEur(savings.saved) }} saved </template>
@@ -133,8 +133,8 @@ const activeCredits = computed(() => unusedActiveCredits(credits.value));
             </p>
             <div class="text-ink-600 dark:text-ink-300 space-y-1.5 text-sm">
               <p class="flex justify-between gap-4">
-                <span>{{ formatNumber(savings.creditPurchaseCount) }} books at list price</span>
-                <span class="font-mono">{{ formatEur(savings.valueAtListPrice) }}</span>
+                <span>{{ formatNumber(savings.creditPurchaseCount) }} books at cash price</span>
+                <span class="font-mono">{{ formatEur(savings.valueAtCashPrice) }}</span>
               </p>
               <p class="flex justify-between gap-4">
                 <span>membership paid</span>
@@ -145,7 +145,7 @@ const activeCredits = computed(() => unusedActiveCredits(credits.value));
                 <span class="font-mono">−{{ formatEur(savings.creditPackCost) }}</span>
               </p>
             </div>
-            <p class="text-ink-400 dark:text-ink-500 font-mono text-[10px] tracking-[0.14em] uppercase">compares credit-bought books against their list prices</p>
+            <p class="text-ink-400 dark:text-ink-500 font-mono text-[10px] tracking-[0.14em] uppercase">compares credit-bought books against their gross cash prices</p>
           </div>
         </div>
       </section>

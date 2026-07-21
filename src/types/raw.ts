@@ -61,6 +61,7 @@ export interface RawPurchaseRow {
   Discount?: string;
   "Consumed Credit"?: string;
   "Price Paid Member"?: string;
+  "Tax Rate"?: string;
   Tax?: string;
   Currency?: string;
   "Product Name"?: string;

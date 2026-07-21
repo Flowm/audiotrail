@@ -38,6 +38,7 @@ export const purchasesDataset: DatasetDescriptor = {
           discount: num(row.Discount),
           consumedCredit: num(row["Consumed Credit"]),
           pricePaid: num(row["Price Paid Member"]),
+          taxRate: num(row["Tax Rate"]),
           tax: num(row.Tax),
           currency: sentinel(row.Currency),
           productName: sentinel(row["Product Name"]),

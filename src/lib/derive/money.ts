@@ -185,21 +185,45 @@ export function costPerYear(billings: BillingEvent[], purchases: Purchase[], day
 }
 
 export interface CreditSavings {
-  /** List-price value of everything bought with credits. */
-  valueAtListPrice: number;
+  /** Gross cash value of everything bought with credits. */
+  valueAtCashPrice: number;
   membershipCost: number;
   creditPackCost: number;
   saved: number;
   creditPurchaseCount: number;
 }
 
+/**
+ * Gross cash price of a single order. Prices are recorded net; the cash
+ * equivalent is price + charged tax, or price × (1 + rate). Credit orders
+ * carry neither Tax nor a Tax Rate (the pack was taxed instead), so the
+ * caller passes the account's dominant VAT rate observed on cash orders.
+ * Without this the comparison below would put a net alternative against
+ * gross actual costs and understate savings by one VAT.
+ */
+function grossCashPrice(purchase: Purchase, fallbackRate: number): number {
+  const net = purchase.regularPrice ?? 0;
+  const tax = purchase.tax ?? 0;
+  if (tax > 0) return net + tax;
+  const rate = purchase.taxRate !== null && purchase.taxRate > 0 ? purchase.taxRate : fallbackRate;
+  return net * (1 + rate);
+}
+
 export function creditsSavings(purchases: Purchase[], billings: BillingEvent[]): CreditSavings {
-  let valueAtListPrice = 0;
+  const rateCounts = new Map<number, number>();
+  for (const purchase of purchases) {
+    if (purchase.taxRate !== null && purchase.taxRate > 0) {
+      rateCounts.set(purchase.taxRate, (rateCounts.get(purchase.taxRate) ?? 0) + 1);
+    }
+  }
+  const fallbackRate = [...rateCounts.entries()].toSorted((a, b) => b[1] - a[1])[0]?.[0] ?? 0;
+
+  let valueAtCashPrice = 0;
   let creditPurchaseCount = 0;
   let creditPackCost = 0;
   for (const purchase of purchases) {
     if (purchase.consumedCredit === 1) {
-      valueAtListPrice += purchase.regularPrice ?? 0;
+      valueAtCashPrice += grossCashPrice(purchase, fallbackRate);
       creditPurchaseCount += 1;
     }
     if (isCreditPack(purchase)) {
@@ -208,10 +232,10 @@ export function creditsSavings(purchases: Purchase[], billings: BillingEvent[]):
   }
   const membershipCost = billings.filter((billing) => billing.type === "Charge").reduce((sum, billing) => sum + (billing.totalAmount ?? 0), 0);
   return {
-    valueAtListPrice: round2(valueAtListPrice),
+    valueAtCashPrice: round2(valueAtCashPrice),
     membershipCost: round2(membershipCost),
     creditPackCost: round2(creditPackCost),
-    saved: round2(valueAtListPrice - membershipCost - creditPackCost),
+    saved: round2(valueAtCashPrice - membershipCost - creditPackCost),
     creditPurchaseCount,
   };
 }

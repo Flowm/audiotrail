@@ -86,6 +86,8 @@ export interface Purchase {
   consumedCredit: number | null;
   /** Effective member cost in EUR. */
   pricePaid: number | null;
+  /** VAT rate applied to the order (0.0699 = 7%); prices are recorded net. */
+  taxRate: number | null;
   tax: number | null;
   currency: string | null;
   productName: string | null;

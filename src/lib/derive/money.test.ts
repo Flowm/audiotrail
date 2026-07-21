@@ -38,6 +38,7 @@ function purchase(over: Partial<Purchase> & { orderPlaceDate: IsoDate; orderId: 
     discount: null,
     consumedCredit: null,
     pricePaid: null,
+    taxRate: null,
     tax: null,
     currency: "EUR",
     productName: null,
@@ -186,7 +187,7 @@ describe("costPerYear", () => {
 });
 
 describe("creditsSavings", () => {
-  it("compares list-price value of credit buys against membership + packs", () => {
+  it("compares cash value of credit buys against membership + packs", () => {
     const savings = creditsSavings(
       [
         purchase({ orderPlaceDate: d("2024-01-01"), orderId: "D1", consumedCredit: 1, regularPrice: 40 }),
@@ -195,11 +196,25 @@ describe("creditsSavings", () => {
       ],
       [billing({ billingDate: d("2024-01-10"), totalAmount: 30 })],
     );
-    expect(savings.valueAtListPrice).toBe(75);
+    expect(savings.valueAtCashPrice).toBe(75);
     expect(savings.membershipCost).toBe(30);
     expect(savings.creditPackCost).toBe(20);
     expect(savings.saved).toBe(25);
     expect(savings.creditPurchaseCount).toBe(2);
+  });
+
+  it("grosses net prices up by the VAT rate observed on cash orders", () => {
+    // audible.de records the 9.95 member price as 9.30 net; credit orders
+    // carry no rate of their own, so the cash orders' 7% is borrowed.
+    const savings = creditsSavings(
+      [
+        purchase({ orderPlaceDate: d("2024-01-01"), orderId: "D1", consumedCredit: 1, regularPrice: 9.3, tax: 0, taxRate: 0 }),
+        purchase({ orderPlaceDate: d("2024-02-01"), orderId: "D2", type: "CASH", saleType: "AL", regularPrice: 9.3, tax: 0.65, taxRate: 0.0699, pricePaid: 0 }),
+      ],
+      [],
+    );
+    expect(savings.valueAtCashPrice).toBe(9.95);
+    expect(savings.saved).toBe(9.95);
   });
 });
 
