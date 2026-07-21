@@ -140,7 +140,14 @@ export function rhythmOption(granularity: RhythmGranularity, days: DayTotal[], p
       type: "category",
       data: categories,
       axisLine: { lineStyle: { color: p.axis } },
-      axisTick: { show: false },
+      // A tick under each label anchors it to its month; alignWithLabel keeps
+      // the two vertically in line on coarse categories.
+      axisTick: {
+        show: true,
+        alignWithLabel: true,
+        interval: granularity === "month" ? "auto" : isMonthTick,
+        lineStyle: { color: p.axis },
+      },
       axisLabel,
       splitLine: { show: false },
     },
