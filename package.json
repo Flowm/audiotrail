@@ -16,7 +16,6 @@
     "deploy:preview": "pnpm build && wrangler versions upload --preview-alias preview-$(git rev-parse --short=8 HEAD)"
   },
   "dependencies": {
-    "@fontsource-variable/fraunces": "^5.2.9",
     "@fontsource-variable/schibsted-grotesk": "^5.2.8",
     "@fontsource/ibm-plex-mono": "^5.2.7",
     "@vueuse/core": "^14.3.0",
