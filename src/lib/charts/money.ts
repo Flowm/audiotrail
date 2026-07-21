@@ -6,8 +6,8 @@ import { formatEur, formatMonth } from "@/lib/format";
 import { baseTooltip, MONO, monoAxisLabel, withAlpha } from "./common";
 import type { ChartPalette } from "./types";
 
-/** Monthly membership + cash bars with a cumulative line on a second axis. */
-export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChartsOption | null {
+/** Membership + cash bars per month or year, cumulative line on a second axis. */
+export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette, granularity: "month" | "year" = "month"): EChartsOption | null {
   if (rows.length === 0) return null;
   let runningTotal = 0;
   const cumulative = rows.map((row) => {
@@ -17,12 +17,13 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChar
 
   // One gift-buying spree shouldn't flatten years of regular months into
   // slivers: cap the bar axis near the 95th percentile when there's a real
-  // outlier, and flag clipped months with their true total.
+  // outlier, and flag clipped months with their true total. Yearly totals
+  // are few and same-order, so they stay uncapped.
   const totals = rows.map((row) => row.membership + row.cash);
   const sorted = totals.toSorted((a, b) => a - b);
   const p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))] ?? 0;
   const maxTotal = sorted[sorted.length - 1] ?? 0;
-  const cap = p95 > 0 && maxTotal > p95 * 1.6 ? Math.ceil((p95 * 1.25) / 5) * 5 : null;
+  const cap = granularity === "month" && p95 > 0 && maxTotal > p95 * 1.6 ? Math.ceil((p95 * 1.25) / 5) * 5 : null;
   const clipped = cap === null ? [] : rows.filter((_, index) => totals[index]! > cap);
 
   return {
@@ -44,7 +45,7 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChar
       data: rows.map((row) => row.month),
       axisLine: { lineStyle: { color: p.axis } },
       axisTick: { show: false },
-      axisLabel: { ...monoAxisLabel(p), formatter: (value: string) => formatMonth(value) },
+      axisLabel: { ...monoAxisLabel(p), formatter: (value: string) => (granularity === "month" ? formatMonth(value) : value) },
     },
     yAxis: [
       {
@@ -64,6 +65,7 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChar
         name: "membership",
         type: "bar",
         stack: "spend",
+        barMaxWidth: 48,
         itemStyle: { color: p.accent },
         data: rows.map((row) => row.membership),
         markPoint:
@@ -96,6 +98,7 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette): EChar
         name: "shop (cash)",
         type: "bar",
         stack: "spend",
+        barMaxWidth: 48,
         itemStyle: { color: p.series[1] },
         data: rows.map((row) => row.cash),
       },

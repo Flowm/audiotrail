@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import BaseChart from "@/components/charts/BaseChart.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
@@ -9,7 +9,7 @@ import { useChartTheme } from "@/composables/useChartTheme";
 import { useDataset } from "@/composables/useDataset";
 import { costPerHourOption, monthlySpendOption } from "@/lib/charts/money";
 import { sankeyOption } from "@/lib/charts/sankey";
-import { costPerYear, creditFlow, creditSankeyData, creditsSavings, expiringCredits, monthlySpend, unusedActiveCredits } from "@/lib/derive/money";
+import { costPerYear, creditFlow, creditSankeyData, creditsSavings, expiringCredits, monthlySpend, unusedActiveCredits, yearlySpend } from "@/lib/derive/money";
 import { formatDate, formatEur, formatNumber } from "@/lib/format";
 import { useTakeoutStore } from "@/stores/takeout";
 
@@ -28,7 +28,11 @@ const hasMoney = computed(() => billingsAvailability.available.value || purchase
 
 const spendRows = computed(() => monthlySpend(billings.value, purchases.value));
 const totalSpend = computed(() => spendRows.value.reduce((sum, row) => sum + row.membership + row.cash, 0));
-const spendChart = computed(() => monthlySpendOption(spendRows.value, palette.value));
+
+const spendGranularity = ref<"month" | "year">("month");
+const spendChart = computed(() =>
+  spendGranularity.value === "month" ? monthlySpendOption(spendRows.value, palette.value) : monthlySpendOption(yearlySpend(spendRows.value), palette.value, "year"),
+);
 
 const flow = computed(() => creditFlow(credits.value));
 const creditChart = computed(() =>
@@ -76,7 +80,28 @@ const activeCredits = computed(() => unusedActiveCredits(credits.value));
       </section>
 
       <section v-if="hasMoney" class="space-y-3">
-        <SectionHeader title="What it cost" hint="per month, with running total" />
+        <div class="flex flex-wrap items-end justify-between gap-2">
+          <SectionHeader title="What it cost" :hint="`per ${spendGranularity}, with running total`" />
+          <div class="flex gap-1">
+            <button
+              v-for="option in [
+                ['month', 'Monthly'],
+                ['year', 'Yearly'],
+              ] as const"
+              :key="option[0]"
+              type="button"
+              :class="[
+                'rounded-full px-2.5 py-1 font-mono text-[11px] transition-colors',
+                spendGranularity === option[0]
+                  ? 'bg-accent-600/15 text-accent-700 dark:bg-accent-400/15 dark:text-accent-300'
+                  : 'text-ink-500 hover:bg-paper-200/60 hover:text-ink-800 dark:text-ink-400 dark:hover:bg-ink-800/60 dark:hover:text-ink-100',
+              ]"
+              @click="spendGranularity = option[0]"
+            >
+              {{ option[1] }}
+            </button>
+          </div>
+        </div>
         <div class="panel p-3 sm:p-4">
           <BaseChart :option="spendChart" :height="300" />
         </div>

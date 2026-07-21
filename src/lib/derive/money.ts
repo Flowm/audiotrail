@@ -7,9 +7,26 @@ import { monthSpan, yearlyTotals, type DayTotal } from "./time";
 const round2 = (value: number): number => Math.round(value * 100) / 100;
 
 export interface MonthlySpend {
+  /** "YYYY-MM", or a bare "YYYY" after yearlySpend aggregation. */
   month: string;
   membership: number;
   cash: number;
+}
+
+/** Roll monthly spend rows up to calendar years. */
+export function yearlySpend(rows: MonthlySpend[]): MonthlySpend[] {
+  const byYear = new Map<string, MonthlySpend>();
+  for (const row of rows) {
+    const year = row.month.slice(0, 4);
+    let entry = byYear.get(year);
+    if (!entry) {
+      entry = { month: year, membership: 0, cash: 0 };
+      byYear.set(year, entry);
+    }
+    entry.membership += row.membership;
+    entry.cash += row.cash;
+  }
+  return [...byYear.values()].toSorted((a, b) => (a.month < b.month ? -1 : 1));
 }
 
 /** Real money out per month: membership charges + cash shop purchases. */
