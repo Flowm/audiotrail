@@ -27,7 +27,7 @@ const returns = computed(() => takeout.bundle?.returns ?? []);
 const hasMoney = computed(() => billingsAvailability.available.value || purchasesAvailability.available.value);
 
 const spendRows = computed(() => monthlySpend(billings.value, purchases.value));
-const totalSpend = computed(() => spendRows.value.reduce((sum, row) => sum + row.membership + row.cash, 0));
+const totalSpend = computed(() => spendRows.value.reduce((sum, row) => sum + row.membership + row.creditPacks + row.shop, 0));
 
 const spendGranularity = ref<"month" | "year">("month");
 const spendChart = computed(() =>

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { isoDate } from "@/lib/ingest/normalize";
 import type { BillingEvent, Credit, IsoDate, Purchase } from "@/types/models";
 
-import { costPerYear, creditFlow, creditSankeyData, creditsSavings, expiringCredits, monthlySpend, unusedActiveCredits } from "./money";
+import { costPerYear, creditFlow, creditSankeyData, creditsSavings, expiringCredits, monthlySpend, unusedActiveCredits, yearlySpend } from "./money";
 
 const d = (s: string): IsoDate => isoDate(s)!;
 
@@ -73,12 +73,28 @@ describe("monthlySpend", () => {
       [
         purchase({ orderPlaceDate: d("2024-01-15"), orderId: "D1", type: "CASH", pricePaid: 5.5 }),
         purchase({ orderPlaceDate: d("2024-02-15"), orderId: "D2", type: "CREDIT", pricePaid: 0 }),
+        purchase({ orderPlaceDate: d("2024-03-15"), orderId: "D3", type: "CASH", saleType: "ALOP", pricePaid: 20 }),
       ],
     );
     expect(rows).toEqual([
-      { month: "2024-01", membership: 9.95, cash: 5.5 },
-      { month: "2024-02", membership: 0, cash: 0 },
-      { month: "2024-03", membership: 9.95, cash: 0 },
+      { month: "2024-01", membership: 9.95, creditPacks: 0, shop: 5.5 },
+      { month: "2024-02", membership: 0, creditPacks: 0, shop: 0 },
+      { month: "2024-03", membership: 9.95, creditPacks: 20, shop: 0 },
+    ]);
+  });
+});
+
+describe("yearlySpend", () => {
+  it("rolls monthly rows up to calendar years", () => {
+    expect(
+      yearlySpend([
+        { month: "2023-11", membership: 10, creditPacks: 0, shop: 5 },
+        { month: "2023-12", membership: 10, creditPacks: 20, shop: 0 },
+        { month: "2024-01", membership: 10, creditPacks: 0, shop: 0 },
+      ]),
+    ).toEqual([
+      { month: "2023", membership: 20, creditPacks: 20, shop: 5 },
+      { month: "2024", membership: 10, creditPacks: 0, shop: 0 },
     ]);
   });
 });

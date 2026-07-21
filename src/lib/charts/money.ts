@@ -11,7 +11,7 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette, granul
   if (rows.length === 0) return null;
   let runningTotal = 0;
   const cumulative = rows.map((row) => {
-    runningTotal += row.membership + row.cash;
+    runningTotal += row.membership + row.creditPacks + row.shop;
     return Math.round(runningTotal * 100) / 100;
   });
 
@@ -19,7 +19,7 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette, granul
   // slivers: cap the bar axis near the 95th percentile when there's a real
   // outlier, and flag clipped months with their true total. Yearly totals
   // are few and same-order, so they stay uncapped.
-  const totals = rows.map((row) => row.membership + row.cash);
+  const totals = rows.map((row) => row.membership + row.creditPacks + row.shop);
   const sorted = totals.toSorted((a, b) => a - b);
   const p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))] ?? 0;
   const maxTotal = sorted[sorted.length - 1] ?? 0;
@@ -90,9 +90,17 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette, granul
                 data: clipped.map((row) => ({
                   name: row.month,
                   coord: [row.month, cap * 0.97],
-                  value: Math.round((row.membership + row.cash) * 100) / 100,
+                  value: Math.round((row.membership + row.creditPacks + row.shop) * 100) / 100,
                 })),
               },
+      },
+      {
+        name: "credit packs",
+        type: "bar",
+        stack: "spend",
+        barMaxWidth: 48,
+        itemStyle: { color: p.series[2] },
+        data: rows.map((row) => row.creditPacks),
       },
       {
         name: "shop (cash)",
@@ -100,7 +108,7 @@ export function monthlySpendOption(rows: MonthlySpend[], p: ChartPalette, granul
         stack: "spend",
         barMaxWidth: 48,
         itemStyle: { color: p.series[1] },
-        data: rows.map((row) => row.cash),
+        data: rows.map((row) => row.shop),
       },
       {
         name: "cumulative",

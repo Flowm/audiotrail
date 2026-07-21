@@ -10,7 +10,10 @@ export interface MonthlySpend {
   /** "YYYY-MM", or a bare "YYYY" after yearlySpend aggregation. */
   month: string;
   membership: number;
-  cash: number;
+  /** Cash purchases of extra credit packs (saleType ALOP). */
+  creditPacks: number;
+  /** All other cash shop purchases. */
+  shop: number;
 }
 
 /** Roll monthly spend rows up to calendar years. */
@@ -20,22 +23,23 @@ export function yearlySpend(rows: MonthlySpend[]): MonthlySpend[] {
     const year = row.month.slice(0, 4);
     let entry = byYear.get(year);
     if (!entry) {
-      entry = { month: year, membership: 0, cash: 0 };
+      entry = { month: year, membership: 0, creditPacks: 0, shop: 0 };
       byYear.set(year, entry);
     }
     entry.membership += row.membership;
-    entry.cash += row.cash;
+    entry.creditPacks += row.creditPacks;
+    entry.shop += row.shop;
   }
   return [...byYear.values()].toSorted((a, b) => (a.month < b.month ? -1 : 1));
 }
 
-/** Real money out per month: membership charges + cash shop purchases. */
+/** Real money out per month: membership charges, credit packs, shop purchases. */
 export function monthlySpend(billings: BillingEvent[], purchases: Purchase[]): MonthlySpend[] {
   const byMonth = new Map<string, MonthlySpend>();
   const bucket = (month: string): MonthlySpend => {
     let entry = byMonth.get(month);
     if (!entry) {
-      entry = { month, membership: 0, cash: 0 };
+      entry = { month, membership: 0, creditPacks: 0, shop: 0 };
       byMonth.set(month, entry);
     }
     return entry;
@@ -46,13 +50,15 @@ export function monthlySpend(billings: BillingEvent[], purchases: Purchase[]): M
   }
   for (const purchase of purchases) {
     if (purchase.type !== "CASH") continue;
-    bucket(purchase.orderPlaceDate.slice(0, 7)).cash += purchase.pricePaid ?? 0;
+    const entry = bucket(purchase.orderPlaceDate.slice(0, 7));
+    if (purchase.saleType === "ALOP") entry.creditPacks += purchase.pricePaid ?? 0;
+    else entry.shop += purchase.pricePaid ?? 0;
   }
   const months = [...byMonth.keys()].toSorted();
   if (months.length === 0) return [];
   return monthSpan(months[0]!, months[months.length - 1]!).map((month) => {
-    const entry = byMonth.get(month) ?? { month, membership: 0, cash: 0 };
-    return { month, membership: round2(entry.membership), cash: round2(entry.cash) };
+    const entry = byMonth.get(month) ?? { month, membership: 0, creditPacks: 0, shop: 0 };
+    return { month, membership: round2(entry.membership), creditPacks: round2(entry.creditPacks), shop: round2(entry.shop) };
   });
 }
 
