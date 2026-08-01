@@ -99,11 +99,6 @@ export default defineConfig({
     // it never blocks the upload page. ~245 kB gzip is its expected size.
     chunkSizeWarningLimit: 800,
     rolldownOptions: {
-      // Silence @vueuse/core's misplaced /* #__PURE__ */ annotation warning
-      onLog(level, log, handler) {
-        if (log.code === "INVALID_ANNOTATION" && log.id?.includes("@vueuse/core")) return;
-        handler(level, log);
-      },
       output: {
         codeSplitting: {
           groups: [
