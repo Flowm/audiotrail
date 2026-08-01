@@ -103,7 +103,7 @@ export default defineConfig({
         codeSplitting: {
           groups: [
             { name: "vue", test: /@vue|vue-router|pinia|@vueuse/, priority: 60 },
-            { name: "echarts", test: /echarts|vue-echarts/, priority: 30 },
+            { name: "echarts", test: /echarts|vue-echarts/, priority: 40 },
             { name: "vendor", test: /node_modules/, priority: 10 },
           ],
         },
