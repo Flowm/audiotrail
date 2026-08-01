@@ -5,5 +5,8 @@ coverage/
 .vite/
 *.local
 .DS_Store
+.env
+.env.*
+!.env.example
 .claude/*
 !.claude/launch.json
