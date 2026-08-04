@@ -118,7 +118,6 @@ const anythingAvailable = computed(
     </section>
 
     <template v-if="anythingAvailable">
-      <!-- Wishlist -->
       <section v-if="wishlistAvailability.available.value" class="space-y-3">
         <SectionHeader title="Wishlist fates" :hint="`${formatNumber(wishlistFunnel.added)} wishes ever made`" />
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -144,7 +143,6 @@ const anythingAvailable = computed(
         </div>
       </section>
 
-      <!-- Search -->
       <section v-if="searchAvailability.available.value" class="space-y-3">
         <SectionHeader title="Search habits" hint="from your store searches" />
         <div class="grid grid-cols-3 gap-3">
@@ -173,7 +171,6 @@ const anythingAvailable = computed(
         </div>
       </section>
 
-      <!-- Devices -->
       <section v-if="devicesAvailability.available.value || playbackAvailability.available.value" class="space-y-3">
         <SectionHeader title="Hardware" hint="players & outputs" />
         <div class="grid gap-3 lg:grid-cols-2">
@@ -198,7 +195,6 @@ const anythingAvailable = computed(
         </div>
       </section>
 
-      <!-- Collections -->
       <section v-if="collectionsAvailability.available.value && userCollections.length > 0" class="space-y-3">
         <SectionHeader title="Your collections" :hint="`${userCollections.length} custom shelves`" />
         <div class="grid gap-3 sm:grid-cols-2">

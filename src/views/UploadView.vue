@@ -69,7 +69,6 @@ function openDashboard(): void {
         Audiotrail turns your Audible data takeout into an interactive dashboard, parsed entirely in your browser. No uploads, no servers, no tracking.
       </p>
 
-      <!-- Drop zone -->
       <div
         v-if="showDropzone"
         :class="[
@@ -113,7 +112,6 @@ function openDashboard(): void {
         {{ takeout.error }}
       </p>
 
-      <!-- Parse progress -->
       <div v-if="busy" class="panel mt-10 w-full px-6 py-10 text-center">
         <svg
           class="text-accent-600 dark:text-accent-400 mx-auto h-8 w-8 animate-spin"
@@ -134,7 +132,6 @@ function openDashboard(): void {
         </p>
       </div>
 
-      <!-- Result -->
       <div v-if="takeout.phase === 'ready' && takeout.report" class="mt-10 w-full space-y-4">
         <LoadReportPanel :report="takeout.report" />
         <div class="flex flex-wrap items-center justify-center gap-3">

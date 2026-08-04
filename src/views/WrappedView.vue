@@ -35,7 +35,6 @@ function close(): void {
 
 <template>
   <div class="relative h-screen snap-y snap-mandatory overflow-y-auto">
-    <!-- floating chrome -->
     <div class="pointer-events-none fixed inset-x-0 top-0 z-20 flex items-center justify-between px-5 py-4 sm:px-8">
       <button
         type="button"
@@ -47,7 +46,6 @@ function close(): void {
       <p class="pointer-events-auto overline">Wrapped · {{ year }}</p>
     </div>
 
-    <!-- 1 · intro -->
     <section class="relative flex min-h-screen snap-start flex-col items-center justify-center px-6 text-center">
       <div
         class="pointer-events-none absolute inset-0"
@@ -86,7 +84,6 @@ function close(): void {
     </section>
 
     <template v-if="stats.totalMs > 0">
-      <!-- 2 · total time -->
       <section class="flex min-h-screen snap-start flex-col items-center justify-center px-6 text-center">
         <p class="overline">You listened for</p>
         <p class="font-display text-ink-900 dark:text-paper-50 mt-4 text-7xl font-semibold tracking-tight sm:text-8xl">
@@ -98,7 +95,6 @@ function close(): void {
         </p>
       </section>
 
-      <!-- 3 · top book -->
       <section v-if="stats.topBook" class="relative flex min-h-screen snap-start flex-col items-center justify-center px-6 text-center">
         <div
           class="pointer-events-none absolute inset-0"
@@ -112,7 +108,6 @@ function close(): void {
         <p class="text-accent-700 dark:text-accent-300 mt-3 font-mono text-xs tracking-[0.18em] uppercase">{{ formatDuration(stats.topBook.ms) }} together</p>
       </section>
 
-      <!-- 4 · people -->
       <section v-if="stats.topAuthor || stats.topNarrator" class="flex min-h-screen snap-start flex-col items-center justify-center gap-14 px-6 text-center">
         <div v-if="stats.topAuthor">
           <p class="overline">Most-read author</p>
@@ -132,7 +127,6 @@ function close(): void {
         </div>
       </section>
 
-      <!-- 5 · big day & streak -->
       <section class="flex min-h-screen snap-start flex-col items-center justify-center gap-14 px-6 text-center">
         <div v-if="stats.biggestDay">
           <p class="overline">Your biggest day</p>
@@ -151,7 +145,6 @@ function close(): void {
         </div>
       </section>
 
-      <!-- 6 · busiest month -->
       <section v-if="stats.busiestMonth" class="flex min-h-screen snap-start flex-col items-center justify-center px-6 text-center">
         <p class="overline">Nothing could stop</p>
         <p class="font-display text-ink-900 dark:text-paper-50 mt-4 text-6xl font-semibold tracking-tight sm:text-7xl">
@@ -162,7 +155,6 @@ function close(): void {
         </p>
       </section>
 
-      <!-- 7 · money -->
       <section v-if="stats.spend !== null && stats.spend > 0" class="flex min-h-screen snap-start flex-col items-center justify-center px-6 text-center">
         <p class="overline">The damage</p>
         <p class="font-display text-ink-900 dark:text-paper-50 mt-4 text-6xl font-semibold tracking-tight sm:text-7xl">
@@ -171,7 +163,6 @@ function close(): void {
         <p v-if="stats.costPerHour !== null" class="text-ink-500 dark:text-ink-400 mt-5 text-sm">which works out to {{ formatEur(stats.costPerHour) }} per listening hour</p>
       </section>
 
-      <!-- 8 · almost finished -->
       <section v-if="stats.almostFinished.length > 0" class="flex min-h-screen snap-start flex-col items-center justify-center px-6 text-center">
         <p class="overline">Abandoned at the finish line</p>
         <div class="mt-8 space-y-5">
@@ -185,7 +176,6 @@ function close(): void {
         <p class="text-ink-500 dark:text-ink-400 mt-8 text-sm">So close. The ending isn't going anywhere.</p>
       </section>
 
-      <!-- 9 · outro -->
       <section class="relative flex min-h-screen snap-start flex-col items-center justify-center px-6 text-center">
         <div
           class="pointer-events-none absolute inset-0"

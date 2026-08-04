@@ -124,7 +124,6 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
     </section>
 
     <template v-if="libraryAvailability.available.value">
-      <!-- Covers toggle -->
       <section class="panel flex flex-wrap items-center justify-between gap-3 px-5 py-3.5">
         <label class="flex cursor-pointer items-center gap-3">
           <span class="relative inline-flex">
@@ -137,7 +136,6 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
         <p class="text-ink-400 dark:text-ink-500 font-mono text-[10px] tracking-[0.14em] uppercase">off = private placeholders · on = ASINs to Audnexus, images from Amazon</p>
       </section>
 
-      <!-- Table -->
       <section class="space-y-3">
         <div class="flex flex-wrap items-end justify-between gap-2">
           <SectionHeader title="Every title" :hint="`${formatNumber(filtered.length)} shown`" />
@@ -251,7 +249,6 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
         </button>
       </section>
 
-      <!-- Acquisition timeline -->
       <section class="space-y-3">
         <SectionHeader title="How the shelf grew" :hint="purchasesAvailability.available.value ? 'books per month, by payment' : 'payment split needs purchase data'" />
         <div class="panel p-3 sm:p-4">
@@ -259,7 +256,6 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
         </div>
       </section>
 
-      <!-- Completion scatter -->
       <section class="space-y-3">
         <SectionHeader title="Length vs completion" hint="bubble size = hours listened" />
         <div class="panel p-3 sm:p-4">
@@ -267,7 +263,6 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
         </div>
       </section>
 
-      <!-- Backlog -->
       <section class="space-y-3">
         <SectionHeader title="The backlog" hint="bought, never pressed play" />
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
@@ -296,7 +291,6 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
         </div>
       </section>
 
-      <!-- Composition -->
       <section class="space-y-3">
         <SectionHeader title="Composition" hint="of your library" />
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
