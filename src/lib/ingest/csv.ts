@@ -14,7 +14,7 @@ const MAX_REPORTED_ERRORS = 5;
  * leave a comma unquoted) are folded into one calm note instead of being
  * reported per row.
  *
- * `normalizeHeader` runs after the trim \u2014 Library and Collections pass
+ * `normalizeHeader` runs after the trim — Library and Collections pass
  * `titleToSnake` so their snake_case parsers read the newer Title Case exports.
  */
 export function parseCsv(text: string, normalizeHeader?: (header: string) => string): CsvResult {
