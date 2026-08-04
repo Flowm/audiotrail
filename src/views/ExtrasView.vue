@@ -30,8 +30,6 @@ const playback = computed(() => takeout.bundle?.playback ?? []);
 const collections = computed(() => takeout.bundle?.collections ?? []);
 const collectionItems = computed(() => takeout.bundle?.collectionItems ?? []);
 
-// ----- wishlist --------------------------------------------------------------
-
 const wishlistFunnel = computed(() => {
   const added = wishlist.value.length;
   const purchased = wishlist.value.filter((w) => w.status === "Wishlist Item Purchased").length;
@@ -52,8 +50,6 @@ const medianWishAge = computed(() => {
   if (ages.length === 0) return null;
   return ages.length % 2 === 1 ? ages[(ages.length - 1) / 2]! : Math.round((ages[ages.length / 2 - 1]! + ages[ages.length / 2]!) / 2);
 });
-
-// ----- search ----------------------------------------------------------------
 
 const searchTotals = computed(() => {
   const sessions = searchSessions.value;
@@ -84,8 +80,6 @@ const topKeywords = computed(() => {
 
 const positionChart = computed(() => clickPositionOption(searchHits.value, palette.value));
 
-// ----- devices & playback ----------------------------------------------------
-
 const outputShare = computed(() => {
   const byOutput = new Map<string, number>();
   for (const event of playback.value) {
@@ -102,8 +96,6 @@ const playbackRange = computed(() => {
     to: playback.value[playback.value.length - 1]!.time,
   };
 });
-
-// ----- collections -----------------------------------------------------------
 
 const userCollections = computed(() => {
   const infos = collections.value.filter((c) => !c.isSystem);

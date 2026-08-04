@@ -25,8 +25,6 @@ const purchasesAvailability = useDataset("purchases");
 const books = computed(() => takeout.bookStats.books);
 const withLibrary = computed(() => books.value.filter((book) => book.library !== null));
 
-// ----- table state -----------------------------------------------------------
-
 type SortKey = "title" | "length" | "purchased" | "listened" | "ratio" | "completion";
 const sortKey = ref<SortKey>("listened");
 const sortDesc = ref(true);
@@ -86,8 +84,6 @@ const filtered = computed(() => {
 });
 
 const visible = computed(() => (showAll.value ? filtered.value : filtered.value.slice(0, PAGE)));
-
-// ----- charts ----------------------------------------------------------------
 
 const acquisitions = computed(() => acquisitionsOption(acquisitionsByMonth(takeout.bundle?.library ?? [], takeout.bundle?.purchases ?? []), palette.value));
 const scatter = computed(() => completionScatterOption(books.value, palette.value));

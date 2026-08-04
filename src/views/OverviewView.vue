@@ -41,8 +41,6 @@ const rangeLabel = computed(() => {
   return `${formatDate(first)} — ${formatDate(last)}`;
 });
 
-// ----- hero stats -----------------------------------------------------------
-
 const totalMs = computed(() => days.value.reduce((sum, day) => sum + day.ms, 0));
 const started = computed(() => books.value.filter((book) => book.totalMs > 0).length);
 const finished = computed(() => books.value.filter((book) => book.finished).length);
@@ -66,15 +64,11 @@ function spendIn(yearPrefix: string | null): number {
 const hasMoneyData = computed(() => (takeout.bundle?.billings.length ?? 0) > 0 || (takeout.bundle?.purchases.length ?? 0) > 0);
 const lifetimeSpend = computed(() => (hasMoneyData.value ? spendIn(null) : null));
 
-// ----- charts ---------------------------------------------------------------
-
 const heatmapOption = computed(() => (days.value.length > 0 && selectedYear.value !== null ? calendarHeatmapOption(days.value, selectedYear.value, palette.value) : null));
 
 const cumulativeOption = computed(() => (days.value.length > 0 ? cumulativeHoursOption(cumulative(days.value), palette.value) : null));
 
 const hasListenedBooks = computed(() => books.value.some((book) => book.totalMs > 0));
-
-// ----- year over year -------------------------------------------------------
 
 interface DeltaRow {
   label: string;

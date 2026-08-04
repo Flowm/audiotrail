@@ -35,8 +35,6 @@ const weekday = computed(() => (days.value.length > 0 ? weekdayOption(weekdayAve
 const histogram = computed(() => (sessions.value.length > 0 ? sessionHistogramOption(sessionLengthHistogram(sessions.value), palette.value) : null));
 const topDays = computed(() => biggestDays(sessions.value, 10));
 
-// ----- habit aggregations ----------------------------------------------------
-
 function shareByMs(pick: (session: (typeof sessions.value)[number]) => string | null, rename?: (key: string) => string): DonutSlice[] {
   const byKey = new Map<string, number>();
   for (const session of sessions.value) {
