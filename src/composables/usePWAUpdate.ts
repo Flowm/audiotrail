@@ -59,7 +59,6 @@ export function usePWAUpdate(options: UsePWAUpdateOptions = {}) {
     }
   };
 
-  // Register the service worker exactly once
   if (!registered) {
     registered = true;
 
@@ -81,7 +80,6 @@ export function usePWAUpdate(options: UsePWAUpdateOptions = {}) {
       onRegistered(registration: ServiceWorkerRegistration | undefined) {
         console.log("PWA: Service worker registered successfully");
 
-        // Set up periodic update checks (only once)
         if (registration && updateInterval > 0 && !intervalId) {
           intervalId = setInterval(() => {
             console.log("PWA: Checking for updates...");

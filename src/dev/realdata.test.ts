@@ -131,7 +131,6 @@ describe.skipIf(samples.length === 0)("real takeout smoke (local samples only)",
     }
     expect(bundle.collections.length + bundle.collectionItems.length).toBe(collectionIdentities.size);
 
-    // Merged library is keyed by unique ASIN.
     expect(new Set(bundle.library.map((item) => item.asin)).size).toBe(bundle.library.length);
     expect(bundle.library.length).toBeGreaterThan(0);
 
