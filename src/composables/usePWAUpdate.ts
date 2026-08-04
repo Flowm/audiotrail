@@ -23,12 +23,8 @@ let registered = false;
 let intervalId: ReturnType<typeof setInterval> | undefined;
 
 /**
- * Composable for managing PWA service worker updates.
- *
- * State is shared (singleton) across all callers. The service worker is registered immediately on the first call.
- *
- * @param options - Configuration options
- * @returns Object containing PWA update state and methods
+ * PWA service worker updates. State is shared (singleton) across all callers,
+ * and the worker is registered immediately on the first call.
  *
  * @example
  * // Automatic updates

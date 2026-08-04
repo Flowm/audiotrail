@@ -10,9 +10,8 @@ const MAX_REPORTED_ERRORS = 5;
 /**
  * Shared CSV entry point: strips the UTF-8 BOM, trims headers (one file has
  * a trailing space in 'Signal strength '), tolerates quoted embedded commas
- * and skips blank lines. Field-count mismatches (older exports occasionally
- * leave a comma unquoted) are folded into one calm note instead of being
- * reported per row.
+ * and skips blank lines. Field-count mismatches are folded into one calm note
+ * rather than reported per row (see below).
  *
  * `normalizeHeader` runs after the trim — Library and Collections pass
  * `titleToSnake` so their snake_case parsers read the newer Title Case exports.
