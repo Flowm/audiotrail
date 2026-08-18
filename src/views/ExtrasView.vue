@@ -38,7 +38,7 @@ const wishlistFunnel = computed(() => {
   return { added, purchased, deleted, waiting: Math.max(0, waiting) };
 });
 
-const survivors = computed(() => wishlist.value.filter((w) => w.status === "Wishlist Item Added" && w.deleteDate === null).sort((a, b) => (a.addDate < b.addDate ? -1 : 1)));
+const survivors = computed(() => wishlist.value.filter((w) => w.status === "Wishlist Item Added" && w.deleteDate === null).toSorted((a, b) => (a.addDate < b.addDate ? -1 : 1)));
 
 const DAY_MS = 86_400_000;
 const survivorAges = computed(() => {
