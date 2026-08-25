@@ -11,8 +11,8 @@ import { useDataset } from "@/composables/useDataset";
 import { donutOption, type DonutSlice } from "@/lib/charts/donut";
 import { acquisitionsOption, completionScatterOption, lagHistogramOption } from "@/lib/charts/library";
 import type { BookStats } from "@/lib/derive/books";
-import { acquisitionsByMonth, backlogStats } from "@/lib/derive/library";
-import { formatDate, formatDuration, formatHours, formatNumber, formatPercent } from "@/lib/format";
+import { acquisitionByAsin, acquisitionsByMonth, backlogStats, type Acquisition } from "@/lib/derive/library";
+import { formatDate, formatDuration, formatEur, formatHours, formatNumber, formatPercent } from "@/lib/format";
 import { useSettingsStore } from "@/stores/settings";
 import { useTakeoutStore } from "@/stores/takeout";
 
@@ -25,7 +25,7 @@ const purchasesAvailability = useDataset("purchases");
 const books = computed(() => takeout.bookStats.books);
 const withLibrary = computed(() => books.value.filter((book) => book.library !== null));
 
-type SortKey = "title" | "length" | "purchased" | "listened" | "ratio" | "completion";
+type SortKey = "title" | "length" | "purchased" | "price" | "listened" | "ratio" | "completion";
 const sortKey = ref<SortKey>("listened");
 const sortDesc = ref(true);
 const query = ref("");
@@ -40,6 +40,43 @@ function listenRatio(book: BookStats): number | null {
   if (book.totalMs <= 0 || book.bookLengthMs === null || book.bookLengthMs <= 0) return null;
   return book.totalMs / book.bookLengthMs;
 }
+
+const prices = computed(() => acquisitionByAsin(takeout.bundle?.purchases ?? []));
+
+function priceOf(book: BookStats): Acquisition | null {
+  return book.asin === null ? null : (prices.value.get(book.asin) ?? null);
+}
+
+/**
+ * Sort rank: cash by amount, then credit buys, then books Purchase History
+ * does not cover. Credits have no cash price, and a zero would file them
+ * among the free promos.
+ */
+function priceRank(book: BookStats): number {
+  const price = priceOf(book);
+  if (price === null) return -2;
+  return price.kind === "cash" ? price.eur : -1;
+}
+
+function priceCell(book: BookStats): { text: string; class: string } {
+  const price = priceOf(book);
+  if (price === null) return { text: "—", class: "text-ink-300 dark:text-ink-600" };
+  if (price.kind === "credit") return { text: "credit", class: "text-ink-500 dark:text-ink-400" };
+  return { text: formatEur(price.eur), class: "text-ink-700 dark:text-ink-200" };
+}
+
+/** Without Purchase History every price is a dash, so drop the column. */
+const showPrice = computed(() => purchasesAvailability.available.value);
+
+const shelfColumns = computed((): [SortKey, string, string][] => [
+  ["title", "Title", ""],
+  ["length", "Length", "w-28"],
+  ["purchased", "Purchased", "w-32"],
+  ...(showPrice.value ? [["price", "Price", "w-24"] as [SortKey, string, string]] : []),
+  ["listened", "Listened", "w-28"],
+  ["ratio", "Times heard", "w-28"],
+  ["completion", "Completion", "w-36"],
+]);
 
 function setSort(key: SortKey): void {
   if (sortKey.value === key) {
@@ -68,6 +105,8 @@ const filtered = computed(() => {
         return book.bookLengthMs ?? -1;
       case "purchased":
         return book.library?.purchaseDate ?? -1;
+      case "price":
+        return priceRank(book);
       case "listened":
         return book.totalMs;
       case "ratio":
@@ -148,21 +187,10 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
         </div>
 
         <div class="panel overflow-x-auto">
-          <table class="w-full min-w-[860px] table-fixed text-left text-sm">
+          <table class="w-full min-w-[940px] table-fixed text-left text-sm">
             <thead>
               <tr class="border-paper-200 dark:border-ink-800 border-b">
-                <th
-                  v-for="column in [
-                    ['title', 'Title', ''],
-                    ['length', 'Length', 'w-28'],
-                    ['purchased', 'Purchased', 'w-32'],
-                    ['listened', 'Listened', 'w-28'],
-                    ['ratio', 'Times heard', 'w-28'],
-                    ['completion', 'Completion', 'w-36'],
-                  ] as [SortKey, string, string][]"
-                  :key="column[0]"
-                  :class="['px-4 py-2.5', column[2]]"
-                >
+                <th v-for="column in shelfColumns" :key="column[0]" :class="['px-4 py-2.5', column[2]]">
                   <button type="button" class="hover:text-ink-700 dark:hover:text-ink-200 flex items-center gap-1 overline" @click="setSort(column[0])">
                     {{ column[1] }}
                     <span v-if="sortKey === column[0]" class="text-accent-600 dark:text-accent-400">
@@ -194,6 +222,9 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                 </td>
                 <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs whitespace-nowrap">
                   {{ book.library?.purchaseDate ? formatDate(book.library.purchaseDate) : "—" }}
+                </td>
+                <td v-if="showPrice" class="px-4 py-2 font-mono text-xs whitespace-nowrap">
+                  <span :class="priceCell(book).class">{{ priceCell(book).text }}</span>
                 </td>
                 <td class="text-ink-700 dark:text-ink-200 px-4 py-2 font-mono text-xs whitespace-nowrap">
                   {{ book.totalMs > 0 ? formatDuration(book.totalMs) : "—" }}

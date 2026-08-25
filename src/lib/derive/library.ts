@@ -1,6 +1,7 @@
 import type { LibraryItem, Purchase } from "@/types/models";
 
 import type { BookStats } from "./books";
+import { isCreditPack, purchaseOutlay } from "./money";
 import { monthSpan } from "./time";
 
 const DAY_MS = 86_400_000;
@@ -62,6 +63,28 @@ export function backlogStats(books: BookStats[]): BacklogStats {
   }
 
   return { neverListened, backlogMs, lagsDays, medianLagDays, lagBuckets };
+}
+
+/** What a book cost: gross EUR including tax, or one credit. */
+export type Acquisition = { kind: "cash"; eur: number } | { kind: "credit" };
+
+/**
+ * Price per ASIN. Credit packs are skipped: they carry an ASIN of their own
+ * and would otherwise price a book at the pack's cost. An ASIN bought twice
+ * (returned, then rebought) keeps its earliest order, as acquisitionsByMonth
+ * does.
+ */
+export function acquisitionByAsin(purchases: Purchase[]): Map<string, Acquisition> {
+  const byAsin = new Map<string, Acquisition>();
+  for (const purchase of purchases) {
+    if (purchase.asin === null || byAsin.has(purchase.asin) || isCreditPack(purchase)) continue;
+    if (purchase.type === "CREDIT" || purchase.consumedCredit === 1) {
+      byAsin.set(purchase.asin, { kind: "credit" });
+    } else if (purchase.type === "CASH") {
+      byAsin.set(purchase.asin, { kind: "cash", eur: purchaseOutlay(purchase) });
+    }
+  }
+  return byAsin;
 }
 
 export interface AcquisitionMonth {
