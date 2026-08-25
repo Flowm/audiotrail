@@ -78,8 +78,10 @@ export interface Purchase {
   /** 'CREDIT' | 'CASH' */
   type: string | null;
   preorder: boolean;
-  /** 'AL' | 'ALOP' (credit packs) | 'ALC' */
+  /** 'AL' (credit order) | 'ALOP' (a-la-carte cash) | 'ALC' (app store) */
   saleType: string | null;
+  /** Mirrors saleType for titles; 'EXCLUDE' on non-book lines like credit packs. */
+  royaltySaleType: string | null;
   regularPrice: number | null;
   discount: number | null;
   /** 1.00 ⟺ paid with a credit. */

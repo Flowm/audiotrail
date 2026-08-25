@@ -29,6 +29,7 @@ describe("purchasesDataset", () => {
     expect(credit!.discount).toBe(-9.3);
     expect(credit!.preorder).toBe(false);
     expect(cash!.saleType).toBe("ALOP");
+    expect(cash!.royaltySaleType).toBe("EXCLUDE");
     expect(cash!.pricePaid).toBe(9.95);
     expect(cash!.asin).toBeNull();
   });

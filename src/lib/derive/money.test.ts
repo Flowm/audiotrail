@@ -34,6 +34,7 @@ function purchase(over: Partial<Purchase> & { orderPlaceDate: IsoDate; orderId: 
     type: "CREDIT",
     preorder: false,
     saleType: "AL",
+    royaltySaleType: "AL",
     regularPrice: null,
     discount: null,
     consumedCredit: null,
@@ -67,7 +68,19 @@ describe("purchaseOutlay / isCreditPack", () => {
   it("reconstructs the gross charge when Price Paid Member is empty", () => {
     // audible.de "5 Extra Guthaben": net 37.20 + 7% VAT 2.60 = 39.80 gross.
     expect(
-      purchaseOutlay(purchase({ orderPlaceDate: d("2025-09-15"), orderId: "D1", type: "CASH", saleType: "ALOP", regularPrice: 37.2, tax: 2.6, discount: 0, pricePaid: 0 })),
+      purchaseOutlay(
+        purchase({
+          orderPlaceDate: d("2025-09-15"),
+          orderId: "D1",
+          type: "CASH",
+          saleType: "ALOP",
+          royaltySaleType: "EXCLUDE",
+          regularPrice: 37.2,
+          tax: 2.6,
+          discount: 0,
+          pricePaid: 0,
+        }),
+      ),
     ).toBe(39.8);
     // fully discounted promo title stays free
     expect(purchaseOutlay(purchase({ orderPlaceDate: d("2021-05-10"), orderId: "D2", type: "CASH", regularPrice: 19.58, tax: 0, discount: -19.58, pricePaid: 0 }))).toBe(0);
@@ -75,11 +88,26 @@ describe("purchaseOutlay / isCreditPack", () => {
     expect(purchaseOutlay(purchase({ orderPlaceDate: d("2024-01-01"), orderId: "D3", type: "CASH", regularPrice: 12, tax: 1, pricePaid: 9.95 }))).toBe(9.95);
   });
 
-  it("detects ALOP orders and app-store credit bundles as packs", () => {
-    expect(isCreditPack(purchase({ orderPlaceDate: d("2025-09-15"), orderId: "D1", type: "CASH", saleType: "ALOP" }))).toBe(true);
-    expect(isCreditPack(purchase({ orderPlaceDate: d("2024-04-21"), orderId: "D2", type: "CASH", saleType: "ALC", productName: "DE - 3 Credit Bundle Purchase" }))).toBe(true);
-    expect(isCreditPack(purchase({ orderPlaceDate: d("2024-04-21"), orderId: "D3", type: "CASH", saleType: "ALC", productName: "Some Book" }))).toBe(false);
-    expect(isCreditPack(purchase({ orderPlaceDate: d("2024-04-21"), orderId: "D4", type: "CREDIT", saleType: "ALOP" }))).toBe(false);
+  it("tells credit packs from a-la-carte titles that share the ALOP sale type", () => {
+    // audible.de "5 Extra Guthaben": ALOP like any cash order, but EXCLUDE royalty.
+    expect(
+      isCreditPack(purchase({ orderPlaceDate: d("2025-09-15"), orderId: "D1", type: "CASH", saleType: "ALOP", royaltySaleType: "EXCLUDE", productName: "5 Extra Guthaben" })),
+    ).toBe(true);
+    // a discounted title from a sale — also ALOP, but it pays a royalty
+    expect(
+      isCreditPack(purchase({ orderPlaceDate: d("2026-08-10"), orderId: "D2", type: "CASH", saleType: "ALOP", royaltySaleType: "ALOP", productName: "Ringworld (Unabridged)" })),
+    ).toBe(false);
+    expect(
+      isCreditPack(
+        purchase({ orderPlaceDate: d("2024-04-21"), orderId: "D3", type: "CASH", saleType: "ALC", royaltySaleType: "EXCLUDE", productName: "DE - 3 Credit Bundle Purchase" }),
+      ),
+    ).toBe(true);
+    expect(isCreditPack(purchase({ orderPlaceDate: d("2024-04-21"), orderId: "D4", type: "CASH", saleType: "ALC", royaltySaleType: "ALC", productName: "Some Book" }))).toBe(false);
+    expect(isCreditPack(purchase({ orderPlaceDate: d("2024-04-21"), orderId: "D5", type: "CREDIT", saleType: "AL", royaltySaleType: "AL" }))).toBe(false);
+    // takeout without the Royalty Sale Type column still recognizes packs by name
+    expect(isCreditPack(purchase({ orderPlaceDate: d("2022-02-01"), orderId: "D6", type: "CASH", saleType: "ALOP", royaltySaleType: null, productName: "3 extra Guthaben" }))).toBe(
+      true,
+    );
   });
 });
 
@@ -94,7 +122,7 @@ describe("monthlySpend", () => {
       [
         purchase({ orderPlaceDate: d("2024-01-15"), orderId: "D1", type: "CASH", pricePaid: 5.5 }),
         purchase({ orderPlaceDate: d("2024-02-15"), orderId: "D2", type: "CREDIT", pricePaid: 0 }),
-        purchase({ orderPlaceDate: d("2024-03-15"), orderId: "D3", type: "CASH", saleType: "ALOP", pricePaid: 20 }),
+        purchase({ orderPlaceDate: d("2024-03-15"), orderId: "D3", type: "CASH", saleType: "ALOP", royaltySaleType: "EXCLUDE", pricePaid: 20 }),
       ],
     );
     expect(rows).toEqual([
@@ -192,7 +220,7 @@ describe("creditsSavings", () => {
       [
         purchase({ orderPlaceDate: d("2024-01-01"), orderId: "D1", consumedCredit: 1, regularPrice: 40 }),
         purchase({ orderPlaceDate: d("2024-02-01"), orderId: "D2", consumedCredit: 1, regularPrice: 35 }),
-        purchase({ orderPlaceDate: d("2024-03-01"), orderId: "D3", type: "CASH", saleType: "ALOP", pricePaid: 20 }),
+        purchase({ orderPlaceDate: d("2024-03-01"), orderId: "D3", type: "CASH", saleType: "ALOP", royaltySaleType: "EXCLUDE", pricePaid: 20 }),
       ],
       [billing({ billingDate: d("2024-01-10"), totalAmount: 30 })],
     );

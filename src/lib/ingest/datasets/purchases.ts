@@ -34,6 +34,7 @@ export const purchasesDataset: DatasetDescriptor = {
           type: sentinel(row.Type),
           preorder: sentinel(row["Preorder Desc"]) === "PRE-ORDER",
           saleType: sentinel(row["Sale Type Desc"]),
+          royaltySaleType: sentinel(row["Royalty Sale Type"]),
           regularPrice: num(row["Regular Price"]),
           discount: num(row.Discount),
           consumedCredit: num(row["Consumed Credit"]),
