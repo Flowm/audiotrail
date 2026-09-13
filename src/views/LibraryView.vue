@@ -11,8 +11,8 @@ import { useDataset } from "@/composables/useDataset";
 import { donutOption, type DonutSlice } from "@/lib/charts/donut";
 import { acquisitionsOption, completionScatterOption, lagHistogramOption } from "@/lib/charts/library";
 import type { BookStats } from "@/lib/derive/books";
-import { acquisitionsByMonth, backlogStats } from "@/lib/derive/library";
-import { formatDate, formatDuration, formatHours, formatNumber, formatPercent } from "@/lib/format";
+import { acquisitionByAsin, acquisitionsByMonth, backlogStats, type Acquisition } from "@/lib/derive/library";
+import { formatDate, formatDuration, formatEur, formatHours, formatNumber, formatPercent } from "@/lib/format";
 import { useSettingsStore } from "@/stores/settings";
 import { useTakeoutStore } from "@/stores/takeout";
 
@@ -25,7 +25,7 @@ const purchasesAvailability = useDataset("purchases");
 const books = computed(() => takeout.bookStats.books);
 const withLibrary = computed(() => books.value.filter((book) => book.library !== null));
 
-type SortKey = "title" | "length" | "purchased" | "listened" | "ratio" | "completion";
+type SortKey = "title" | "length" | "purchased" | "price" | "listened" | "ratio" | "completion";
 const sortKey = ref<SortKey>("listened");
 const sortDesc = ref(true);
 const query = ref("");
@@ -40,6 +40,48 @@ function listenRatio(book: BookStats): number | null {
   if (book.totalMs <= 0 || book.bookLengthMs === null || book.bookLengthMs <= 0) return null;
   return book.totalMs / book.bookLengthMs;
 }
+
+const prices = computed(() => acquisitionByAsin(takeout.bundle?.purchases ?? []));
+
+function priceOf(book: BookStats): Acquisition | null {
+  return book.asin === null ? null : (prices.value.get(book.asin) ?? null);
+}
+
+/**
+ * Sort rank: cash by amount, then credit buys, then books Purchase History
+ * does not cover. Credits have no cash price, and a zero would file them
+ * among the free promos.
+ */
+function priceRank(book: BookStats): number {
+  const price = priceOf(book);
+  if (price === null) return -2;
+  return price.kind === "cash" ? price.eur : -1;
+}
+
+function priceCell(book: BookStats): { text: string; class: string } {
+  const price = priceOf(book);
+  if (price === null) return { text: "—", class: "text-ink-300 dark:text-ink-600" };
+  if (price.kind === "credit") return { text: "credit", class: "text-ink-500 dark:text-ink-400" };
+  return { text: formatEur(price.eur), class: "text-ink-700 dark:text-ink-200" };
+}
+
+/** Without Purchase History every price is a dash, so drop the column. */
+const showPrice = computed(() => purchasesAvailability.available.value);
+
+/**
+ * Under table-fixed the title column has no width of its own — it lives on
+ * what the others leave behind, so each of those is sized to its widest real
+ * value ("62 h 49 min", "Jan 24, 2025").
+ */
+const shelfColumns = computed((): [SortKey, string, string][] => [
+  ["title", "Title", ""],
+  ["length", "Length", "w-24"],
+  ["purchased", "Purchased", "w-28"],
+  ...(showPrice.value ? [["price", "Price", "w-20"] as [SortKey, string, string]] : []),
+  ["listened", "Listened", "w-24"],
+  ["ratio", "Times heard", "w-20"],
+  ["completion", "Completion", "w-32"],
+]);
 
 function setSort(key: SortKey): void {
   if (sortKey.value === key) {
@@ -68,6 +110,8 @@ const filtered = computed(() => {
         return book.bookLengthMs ?? -1;
       case "purchased":
         return book.library?.purchaseDate ?? -1;
+      case "price":
+        return priceRank(book);
       case "listened":
         return book.totalMs;
       case "ratio":
@@ -148,21 +192,10 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
         </div>
 
         <div class="panel overflow-x-auto">
-          <table class="w-full min-w-[860px] table-fixed text-left text-sm">
+          <table class="w-full min-w-[980px] table-fixed text-left text-sm">
             <thead>
               <tr class="border-paper-200 dark:border-ink-800 border-b">
-                <th
-                  v-for="column in [
-                    ['title', 'Title', ''],
-                    ['length', 'Length', 'w-28'],
-                    ['purchased', 'Purchased', 'w-32'],
-                    ['listened', 'Listened', 'w-28'],
-                    ['ratio', 'Times heard', 'w-28'],
-                    ['completion', 'Completion', 'w-36'],
-                  ] as [SortKey, string, string][]"
-                  :key="column[0]"
-                  :class="['px-4 py-2.5', column[2]]"
-                >
+                <th v-for="column in shelfColumns" :key="column[0]" :class="['px-3 py-2.5', column[2]]">
                   <button type="button" class="hover:text-ink-700 dark:hover:text-ink-200 flex items-center gap-1 overline" @click="setSort(column[0])">
                     {{ column[1] }}
                     <span v-if="sortKey === column[0]" class="text-accent-600 dark:text-accent-400">
@@ -170,16 +203,16 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                     </span>
                   </button>
                 </th>
-                <th class="w-28 px-4 py-2.5 overline">Status</th>
+                <th class="w-28 px-3 py-2.5 overline">Status</th>
               </tr>
             </thead>
             <tbody class="divide-paper-200/60 dark:divide-ink-800/60 divide-y">
               <tr v-for="book in visible" :key="book.key" class="align-middle">
-                <td class="px-4 py-2">
+                <td class="px-3 py-2">
                   <div class="flex items-center gap-3">
                     <BookCover :asin="book.asin" :title="book.title" class="w-9 text-[10px]" />
                     <div class="min-w-0">
-                      <p class="text-ink-800 dark:text-ink-100 truncate font-medium" :title="book.title">
+                      <p class="text-ink-800 dark:text-ink-100 line-clamp-2 font-medium" :title="book.title">
                         {{ book.title }}
                       </p>
                       <p class="text-ink-400 dark:text-ink-500 truncate text-xs">
@@ -189,25 +222,28 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                     </div>
                   </div>
                 </td>
-                <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs whitespace-nowrap">
+                <td class="text-ink-500 dark:text-ink-400 px-3 py-2 font-mono text-xs whitespace-nowrap">
                   {{ book.bookLengthMs ? formatDuration(book.bookLengthMs) : "—" }}
                 </td>
-                <td class="text-ink-500 dark:text-ink-400 px-4 py-2 font-mono text-xs whitespace-nowrap">
+                <td class="text-ink-500 dark:text-ink-400 px-3 py-2 font-mono text-xs whitespace-nowrap">
                   {{ book.library?.purchaseDate ? formatDate(book.library.purchaseDate) : "—" }}
                 </td>
-                <td class="text-ink-700 dark:text-ink-200 px-4 py-2 font-mono text-xs whitespace-nowrap">
+                <td v-if="showPrice" class="px-3 py-2 font-mono text-xs whitespace-nowrap">
+                  <span :class="priceCell(book).class">{{ priceCell(book).text }}</span>
+                </td>
+                <td class="text-ink-700 dark:text-ink-200 px-3 py-2 font-mono text-xs whitespace-nowrap">
                   {{ book.totalMs > 0 ? formatDuration(book.totalMs) : "—" }}
                 </td>
-                <td class="px-4 py-2 font-mono text-xs whitespace-nowrap" :title="listenRatio(book) !== null ? 'listened ÷ length' : undefined">
+                <td class="px-3 py-2 font-mono text-xs whitespace-nowrap" :title="listenRatio(book) !== null ? 'listened ÷ length' : undefined">
                   <!-- re-listened books (≥1.2×) get the accent so they jump out -->
                   <span v-if="listenRatio(book) !== null" :class="listenRatio(book)! >= 1.2 ? 'text-accent-700 dark:text-accent-300' : 'text-ink-500 dark:text-ink-400'">
                     {{ listenRatio(book)!.toFixed(1) }}×
                   </span>
                   <span v-else class="text-ink-300 dark:text-ink-600">—</span>
                 </td>
-                <td class="px-4 py-2">
+                <td class="px-3 py-2">
                   <div v-if="book.completion !== null" class="flex items-center gap-2">
-                    <span class="bg-paper-200 dark:bg-ink-800 h-1.5 w-20 overflow-hidden rounded-full">
+                    <span class="bg-paper-200 dark:bg-ink-800 h-1.5 w-16 overflow-hidden rounded-full">
                       <!-- finished bars fade back so the rare in-progress rows stand out -->
                       <span
                         :class="['block h-full rounded-full', book.completion >= 0.995 ? 'bg-accent-500/30 dark:bg-accent-400/25' : 'bg-accent-500']"
@@ -220,7 +256,7 @@ const totalLengthMs = computed(() => withLibrary.value.reduce((sum, book) => sum
                   </div>
                   <span v-else class="text-ink-300 dark:text-ink-600 font-mono text-xs">—</span>
                 </td>
-                <td class="px-4 py-2">
+                <td class="px-3 py-2">
                   <span v-if="book.library?.ownership === 'Revoked'" class="rounded-full bg-rose-500/10 px-2 py-0.5 font-mono text-[10px] text-rose-600 dark:text-rose-400">
                     returned
                   </span>

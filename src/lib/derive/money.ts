@@ -23,18 +23,23 @@ export function purchaseOutlay(purchase: Purchase): number {
 // Bundle Purchase" (Apple in-app, saleType ALC), "Audible Guthaben".
 const PACK_NAME = /guthaben|credit bundle|extra credit/i;
 
-/** Cash purchases of extra credits — ALOP orders plus app-store bundles. */
+/**
+ * Cash purchases of extra credits rather than of a title. Sale Type Desc
+ * cannot tell the two apart — packs and a-la-carte titles are both ALOP,
+ * so keying off it files a whole sale haul as credit packs. Royalty Sale
+ * Type does: a pack owes no author royalty and is booked EXCLUDE. The
+ * name check covers takeouts without that column.
+ */
 export function isCreditPack(purchase: Purchase): boolean {
   if (purchase.type !== "CASH") return false;
-  if (purchase.saleType === "ALOP") return true;
-  return PACK_NAME.test(purchase.productName ?? "");
+  return purchase.royaltySaleType === "EXCLUDE" || PACK_NAME.test(purchase.productName ?? "");
 }
 
 export interface MonthlySpend {
   /** "YYYY-MM", or a bare "YYYY" after yearlySpend aggregation. */
   month: string;
   membership: number;
-  /** Cash purchases of extra credit packs (saleType ALOP). */
+  /** Cash purchases of extra credit packs. */
   creditPacks: number;
   /** All other cash shop purchases. */
   shop: number;

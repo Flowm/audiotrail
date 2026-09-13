@@ -57,6 +57,7 @@ export interface RawPurchaseRow {
   Type?: string;
   "Preorder Desc"?: string;
   "Sale Type Desc"?: string;
+  "Royalty Sale Type"?: string;
   "Regular Price"?: string;
   Discount?: string;
   "Consumed Credit"?: string;
