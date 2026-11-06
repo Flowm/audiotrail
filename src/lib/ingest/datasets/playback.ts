@@ -1,8 +1,8 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { epochMs, headerAlias, int, sentinel } from "@/lib/ingest/normalize";
 import type { PlaybackEvent } from "@/types/models";
 import type { RawPlaybackRow } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { epochMs, headerAlias, int, sentinel } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 // The per-event timestamp is 'Time' in older exports, 'Creation Date' in 2026.

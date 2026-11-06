@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { VirtualFile } from "../provider";
+import type { VirtualFile } from "@/lib/ingest/provider";
+
 import { billingsDataset } from "./billings";
 import { collectionsDataset } from "./collections";
 import { creditsDataset } from "./credits";

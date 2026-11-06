@@ -1,8 +1,8 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { isoDate, num, sentinel } from "@/lib/ingest/normalize";
 import type { ListeningSession } from "@/types/models";
 import type { RawListeningRow } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { isoDate, num, sentinel } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 const PROFILE_RE = /Audible\.Listening\/([^/]+)\/[^/]*\.csv$/i;

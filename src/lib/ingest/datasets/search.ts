@@ -1,8 +1,8 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { epochMs, int, isoDate, sentinel, yesNo } from "@/lib/ingest/normalize";
 import type { SearchHit, SearchSession } from "@/types/models";
 import type { RawSearchHitRow, RawSearchSessionRow } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { epochMs, int, isoDate, sentinel, yesNo } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 export const searchSessionsDataset: DatasetDescriptor = {

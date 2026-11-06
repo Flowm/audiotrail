@@ -1,8 +1,8 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { isoDate, sentinel } from "@/lib/ingest/normalize";
 import type { WishlistItem } from "@/types/models";
 import type { RawWishlistRow } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { isoDate, sentinel } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 export const wishlistDataset: DatasetDescriptor = {
