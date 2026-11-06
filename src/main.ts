@@ -7,7 +7,7 @@ import "./style.css";
 import { usePWAUpdate } from "./composables/usePWAUpdate";
 import router from "./router";
 
+createApp(App).use(createPinia()).use(router).mount("#app");
+
 // Register the service worker; the update prompt is rendered by PWAUpdateBar.
 usePWAUpdate();
-
-createApp(App).use(createPinia()).use(router).mount("#app");
