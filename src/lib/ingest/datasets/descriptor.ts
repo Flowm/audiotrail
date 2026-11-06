@@ -1,6 +1,5 @@
+import type { VirtualFile } from "@/lib/ingest/provider";
 import type { DatasetKey, TakeoutBundle } from "@/types/takeout";
-
-import type { VirtualFile } from "../provider";
 
 export interface DatasetParseResult {
   patch: Partial<TakeoutBundle>;

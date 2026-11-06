@@ -1,9 +1,9 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { epochMs, int, isoDate, num, sentinel } from "@/lib/ingest/normalize";
+import type { VirtualFile } from "@/lib/ingest/provider";
 import type { CartItem, ContentReturn, DeviceActivation, Impression, MembershipEvent } from "@/types/models";
 import type { RawCartRow, RawDeviceRow, RawImpressionRow, RawMembershipEventRow, RawReturnRow } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { epochMs, int, isoDate, num, sentinel } from "../normalize";
-import type { VirtualFile } from "../provider";
 import type { DatasetDescriptor, DatasetParseResult } from "./descriptor";
 
 async function collectRows(files: VirtualFile[], warnings: string[]): Promise<Record<string, string>[]> {

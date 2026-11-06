@@ -1,9 +1,9 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { epochMs, yesNo } from "@/lib/ingest/normalize";
+import type { VirtualFile } from "@/lib/ingest/provider";
 import type { AccountInfo } from "@/types/models";
 import type { RawAccountJson } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { epochMs, yesNo } from "../normalize";
-import type { VirtualFile } from "../provider";
 import type { DatasetDescriptor } from "./descriptor";
 
 /** marketplace → attribute → every value seen for it across the account files. */

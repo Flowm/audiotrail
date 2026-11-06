@@ -1,8 +1,8 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { headerAlias, int, isoDate, num, sentinel } from "@/lib/ingest/normalize";
 import type { BillingEvent } from "@/types/models";
 import type { RawBillingRow } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { headerAlias, int, isoDate, num, sentinel } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 // 'Plan Billing Freq' in older exports; renamed to 'Plan Billing Frequency' in 2026.

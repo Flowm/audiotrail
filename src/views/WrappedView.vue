@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronDown } from "@lucide/vue";
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -70,17 +71,7 @@ function close(): void {
           {{ candidate }}
         </button>
       </div>
-      <svg
-        class="text-ink-400 dark:text-ink-500 absolute bottom-8 h-5 w-5 animate-bounce"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="m6 9 6 6 6-6" />
-      </svg>
+      <ChevronDown class="text-ink-400 dark:text-ink-500 absolute bottom-8 h-5 w-5 animate-bounce" />
     </section>
 
     <template v-if="stats.totalMs > 0">

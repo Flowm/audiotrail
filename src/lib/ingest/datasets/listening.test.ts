@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { VirtualFile } from "../provider";
+import type { VirtualFile } from "@/lib/ingest/provider";
+
 import { listeningDataset } from "./listening";
 
 const vf = (path: string, content: string): VirtualFile => ({

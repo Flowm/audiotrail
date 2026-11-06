@@ -1,8 +1,8 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { epochMs, int, sentinel, splitList, titleToSnake, yesNo } from "@/lib/ingest/normalize";
 import type { LibraryItem, SeriesRef } from "@/types/models";
 import type { RawLibraryRow } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { epochMs, int, sentinel, splitList, titleToSnake, yesNo } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 const SERIES_RE = /^asin:([^,]*),\s*title:(.*)$/;

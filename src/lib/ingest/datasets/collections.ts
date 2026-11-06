@@ -1,8 +1,8 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { epochMs, headerAlias, int, sentinel, titleToSnake, yesNo } from "@/lib/ingest/normalize";
 import type { CollectionInfo, CollectionItem } from "@/types/models";
 import type { RawCollectionRow } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { epochMs, headerAlias, int, sentinel, titleToSnake, yesNo } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 const SYSTEM_IDS = new Set(["PENDING", "PURCHASE", "WISHLIST", "ARCHIVE", "AYCL"]);

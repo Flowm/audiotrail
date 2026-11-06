@@ -1,8 +1,8 @@
+import { parseCsv } from "@/lib/ingest/csv";
+import { isoDate, num, orderId, sentinel } from "@/lib/ingest/normalize";
 import type { Credit } from "@/types/models";
 import type { RawCreditRow } from "@/types/raw";
 
-import { parseCsv } from "../csv";
-import { isoDate, num, orderId, sentinel } from "../normalize";
 import type { DatasetDescriptor } from "./descriptor";
 
 export const creditsDataset: DatasetDescriptor = {

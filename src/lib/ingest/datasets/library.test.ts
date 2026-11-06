@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import type { VirtualFile } from "@/lib/ingest/provider";
 import type { RawLibraryRow } from "@/types/raw";
 
-import type { VirtualFile } from "../provider";
 import { libraryDataset, mergeLibraryRows, parseSeriesInfo } from "./library";
 
 const vf = (path: string, content: string): VirtualFile => ({
