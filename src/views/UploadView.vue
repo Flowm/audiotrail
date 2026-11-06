@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronDown, LoaderCircle, Upload } from "@lucide/vue";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
@@ -85,17 +86,7 @@ function openDashboard(): void {
         @dragleave="dragOver = false"
         @drop.prevent="onDrop"
       >
-        <svg
-          class="text-ink-300 dark:text-ink-600 h-10 w-10"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-        </svg>
+        <Upload class="text-ink-300 dark:text-ink-600 h-10 w-10" :stroke-width="1.5" />
         <p class="text-ink-700 dark:text-ink-200 text-sm font-medium">
           Drop
           <code class="bg-paper-200/70 dark:bg-ink-800 rounded px-1 py-0.5 font-mono text-[12px]">Audible.zip</code>
@@ -113,16 +104,7 @@ function openDashboard(): void {
       </p>
 
       <div v-if="busy" class="panel mt-10 w-full px-6 py-10 text-center">
-        <svg
-          class="text-accent-600 dark:text-accent-400 mx-auto h-8 w-8 animate-spin"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-        >
-          <path d="M21 12a9 9 0 1 1-6.2-8.56" />
-        </svg>
+        <LoaderCircle class="text-accent-600 dark:text-accent-400 mx-auto h-8 w-8 animate-spin" />
         <p class="text-ink-700 dark:text-ink-200 mt-4 text-sm font-medium">
           {{ takeout.phase === "reading" ? "Reading zip…" : "Parsing your takeout…" }}
         </p>
@@ -175,17 +157,7 @@ function openDashboard(): void {
         <details class="panel group mt-10 w-full">
           <summary class="text-ink-700 dark:text-ink-200 flex cursor-pointer list-none items-center justify-between px-6 py-5 text-sm font-medium">
             How do I get my data?
-            <svg
-              class="text-ink-400 h-4 w-4 transition-transform group-open:rotate-180"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
+            <ChevronDown class="text-ink-400 h-4 w-4 transition-transform group-open:rotate-180" />
           </summary>
           <div class="px-6 pb-5">
             <TakeoutSteps />

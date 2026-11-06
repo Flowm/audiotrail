@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Book, Clock, Euro, Gift, Info, LayoutGrid, Lock, Sparkle, Users, type LucideIcon } from "@lucide/vue";
 import { useRouter } from "vue-router";
 
 import DarkToggle from "@/components/ui/DarkToggle.vue";
@@ -9,52 +10,52 @@ import { useTakeoutStore } from "@/stores/takeout";
 interface NavItem {
   label: string;
   to: string;
-  icon: string;
+  icon: LucideIcon;
 }
 
 const explore: NavItem[] = [
   {
     label: "Overview",
     to: "/overview",
-    icon: "M3.5 3.5h7v7h-7zM13.5 3.5h7v7h-7zM3.5 13.5h7v7h-7zM13.5 13.5h7v7h-7z",
+    icon: LayoutGrid,
   },
   {
     label: "Listening",
     to: "/listening",
-    icon: "M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zM12 7v5l3.5 2",
+    icon: Clock,
   },
   {
     label: "Library",
     to: "/library",
-    icon: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2.5H6.5A2.5 2.5 0 0 0 4 5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5",
+    icon: Book,
   },
   {
     label: "People",
     to: "/people",
-    icon: "M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM21 21v-2a4 4 0 0 0-3-3.85M15.5 3.15a4 4 0 0 1 0 7.7",
+    icon: Users,
   },
   {
     label: "Money",
     to: "/money",
-    icon: "M4.5 9.5h11M4.5 14.5h8M19.5 5.3a8.6 8.6 0 0 0-6.1-2.5C8.7 2.8 4.9 6.9 4.9 12s3.8 9.2 8.5 9.2c2.4 0 4.5-1 6.1-2.5",
+    icon: Euro,
   },
   {
     label: "Extras",
     to: "/extras",
-    icon: "M12 3.5l1.8 5.4a2 2 0 0 0 1.3 1.3l5.4 1.8-5.4 1.8a2 2 0 0 0-1.3 1.3L12 20.5l-1.8-5.4a2 2 0 0 0-1.3-1.3L3.5 12l5.4-1.8a2 2 0 0 0 1.3-1.3z",
+    icon: Sparkle,
   },
 ];
 
 const wrapped: NavItem = {
   label: "Wrapped",
   to: "/wrapped",
-  icon: "M20 12.5V21H4v-8.5M2.5 7.5h19v5h-19zM12 21V7.5M12 7.5H7.7a2.6 2.6 0 1 1 0-5.2C11 2.3 12 7.5 12 7.5zM12 7.5h4.3a2.6 2.6 0 1 0 0-5.2C13 2.3 12 7.5 12 7.5z",
+  icon: Gift,
 };
 
 const about: NavItem = {
   label: "About",
   to: "/about",
-  icon: "M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zM12 16.5v-5M12 7.8h.01",
+  icon: Info,
 };
 
 const takeout = useTakeoutStore();
@@ -93,9 +94,7 @@ function clearData(): void {
                 ]"
                 @click="navigate"
               >
-                <svg class="h-[18px] w-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path :d="item.icon" />
-                </svg>
+                <component :is="item.icon" class="h-[18px] w-[18px] shrink-0" :stroke-width="1.7" />
                 {{ item.label }}
               </a>
             </RouterLink>
@@ -123,9 +122,7 @@ function clearData(): void {
                 ]"
                 @click="navigate"
               >
-                <svg class="h-[18px] w-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path :d="wrapped.icon" />
-                </svg>
+                <component :is="wrapped.icon" class="h-[18px] w-[18px] shrink-0" :stroke-width="1.7" />
                 {{ wrapped.label }}
               </a>
             </RouterLink>
@@ -141,9 +138,7 @@ function clearData(): void {
                 ]"
                 @click="navigate"
               >
-                <svg class="h-[18px] w-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path :d="about.icon" />
-                </svg>
+                <component :is="about.icon" class="h-[18px] w-[18px] shrink-0" :stroke-width="1.7" />
                 {{ about.label }}
               </a>
             </RouterLink>
@@ -171,10 +166,7 @@ function clearData(): void {
           </button>
         </div>
         <p class="text-ink-400 dark:text-ink-500 flex items-center gap-1.5 font-mono text-[9.5px] tracking-[0.18em] uppercase">
-          <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <rect x="4.5" y="10.5" width="15" height="10" rx="2" />
-            <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
-          </svg>
+          <Lock class="h-3 w-3" />
           100% local
         </p>
       </div>
