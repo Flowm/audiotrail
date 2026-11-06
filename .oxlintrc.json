@@ -10,7 +10,11 @@
     "consistent-function-scoping": "off",
     "import/no-unassigned-import": ["warn", { "allow": ["**/*.css", "**/echarts"] }],
     "no-console": "off",
+    // Ingest reads and parses export files one at a time on purpose: progress updates
+    // can render between files and only one file's text is held in memory at once.
     "no-await-in-loop": "off",
+    // The flagged maps copy small top-N lists into new view rows; the copy keeps
+    // reactive sources untouched and costs nothing at that size.
     "no-map-spread": "off",
     "no-underscore-dangle": "off"
   },
